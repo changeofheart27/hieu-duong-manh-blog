@@ -1,12 +1,10 @@
 package com.nashtech.hieuduongmanhblog.controller;
 
 import com.nashtech.hieuduongmanhblog.entity.Post;
-import com.nashtech.hieuduongmanhblog.entity.User;
 import com.nashtech.hieuduongmanhblog.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,7 +44,6 @@ public class PostController {
     }
 
     @PutMapping("/posts/{postId}")
-//    @PreAuthorize(value = admin)
     public ResponseEntity<Post> updateExistingPost(@PathVariable int postId, @RequestBody Post newPost) {
         Post updatedPost = postService.updatePostById(postId, newPost);
         return new ResponseEntity<>(updatedPost, HttpStatus.OK);

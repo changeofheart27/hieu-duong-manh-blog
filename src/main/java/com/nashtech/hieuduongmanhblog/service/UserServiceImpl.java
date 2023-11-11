@@ -54,16 +54,19 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map(role -> role.getAuthority())
                 .collect(Collectors.joining(","));
-        if (currentUserRole.contains("USER") || currentUserRole.contains("AUTHOR")) {
+        if (!currentUserRole.contains("ADMIN")) {
             // check if user to update has the same username as current user
             if (!currentUserInfo.getUsername().equals(userToUpdate.getUsername())) {
                 throw new RuntimeException("Unable to update User with username - " + userToUpdate.getUsername());
             }
         }
 
-        userToUpdate.setDob(newUser.getDob());
-        userToUpdate.setEmail(newUser.getEmail());
-        userToUpdate.setCreatedAt(LocalDate.now());
+        if (newUser.getDob() != null) {
+            userToUpdate.setDob(newUser.getDob());
+        }
+        if (newUser.getEmail() != null) {
+            userToUpdate.setEmail(newUser.getEmail());
+        }
         return userRepository.save(userToUpdate);
     }
 
@@ -76,7 +79,7 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map(role -> role.getAuthority())
                 .collect(Collectors.joining(","));
-        if (currentUserRole.contains("USER") || currentUserRole.contains("AUTHOR")) {
+        if (!currentUserRole.contains("ADMIN")) {
             // check if user to delete has the same username as current user
             if (!currentUserInfo.getUsername().equals(userToDelete.getUsername())) {
                 throw new RuntimeException("Unable to delete User with username - " + userToDelete.getUsername());
@@ -85,8 +88,7 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userToDelete.getId());
     }
 
-    @Override
-    public UserDetails getCurrentLoggedInUser() {
+    private UserDetails getCurrentLoggedInUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return (UserDetails) auth.getPrincipal();
     }

@@ -1,11 +1,8 @@
 package com.nashtech.hieuduongmanhblog.config;
 
 import com.nashtech.hieuduongmanhblog.entity.User;
-import com.nashtech.hieuduongmanhblog.filter.JwtAuthenticationFilter;
 import com.nashtech.hieuduongmanhblog.repository.UserRepository;
-import com.nashtech.hieuduongmanhblog.service.JwtUtilService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
 public class ApplicationConfig {

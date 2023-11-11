@@ -68,7 +68,7 @@ public class PostServiceImpl implements PostService {
                 .stream()
                 .map(role -> role.getAuthority())
                 .collect(Collectors.joining(","));
-        if (currentUserRole.contains("AUTHOR")) {
+        if (!currentUserRole.contains("ADMIN")) {
             String postAuthor = postToUpdate.getUser().getUsername();
             // check if post to update has the same username as current user
             if (!currentUserInfo.getUsername().equals(postAuthor)) {
@@ -76,11 +76,16 @@ public class PostServiceImpl implements PostService {
             }
         }
 
-        postToUpdate.setTitle(newPost.getTitle());
-        postToUpdate.setDescription(newPost.getDescription());
-        postToUpdate.setContent(newPost.getContent());
-        postToUpdate.setCreatedAt(LocalDate.now());
-        return postRepository.save(newPost);
+        if (newPost.getTitle() != null) {
+            postToUpdate.setTitle(newPost.getTitle());
+        }
+        if (newPost.getDescription() != null) {
+            postToUpdate.setDescription(newPost.getDescription());
+        }
+        if (newPost.getContent() != null) {
+            postToUpdate.setContent(newPost.getContent());
+        }
+        return postRepository.save(postToUpdate);
     }
 
     @Override
@@ -92,7 +97,7 @@ public class PostServiceImpl implements PostService {
                 .stream()
                 .map(role -> role.getAuthority())
                 .collect(Collectors.joining(","));
-        if (currentUserRole.contains("AUTHOR")) {
+        if (!currentUserRole.contains("ADMIN")) {
             String postAuthor = postToDelete.getUser().getUsername();
             // check if post to delete has the same username as current user
             if (!currentUserInfo.getUsername().equals(postAuthor)) {
@@ -102,8 +107,7 @@ public class PostServiceImpl implements PostService {
         postRepository.deleteById(postId);
     }
 
-    @Override
-    public UserDetails getCurrentLoggedInUser() {
+    private UserDetails getCurrentLoggedInUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return (UserDetails) auth.getPrincipal();
     }
