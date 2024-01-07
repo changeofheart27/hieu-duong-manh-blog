@@ -1,17 +1,17 @@
 package com.nashtech.hieuduongmanhblog.service;
 
-import com.nashtech.hieuduongmanhblog.entity.User;
+import com.nashtech.hieuduongmanhblog.dto.UserDTO;
 
 import java.util.List;
 
 public interface UserService {
-    List<User> getAllUsers();
+    List<UserDTO> getAllUsers();
 
-    User findUserById(int userId);
+    UserDTO findUserById(int userId);
 
-    User findUserByUsername(String username);
+    UserDTO findUserByUsername(String username);
 
-    User updateUserById(int userId, User newUser);
+    UserDTO updateUserById(int userId, UserDTO newUser);
 
     void deleteUserById(int userId);
 }

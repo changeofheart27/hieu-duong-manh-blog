@@ -1,6 +1,6 @@
 package com.nashtech.hieuduongmanhblog.controller;
 
-import com.nashtech.hieuduongmanhblog.entity.Post;
+import com.nashtech.hieuduongmanhblog.dto.PostDTO;
 import com.nashtech.hieuduongmanhblog.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,32 +20,32 @@ public class PostController {
     }
 
     @GetMapping(value = "/posts", params = {})
-    public ResponseEntity<List<Post>> getAllPosts() {
-        List<Post> posts = postService.getAllPosts();
+    public ResponseEntity<List<PostDTO>> getAllPosts() {
+        List<PostDTO> posts = postService.getAllPosts();
         return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
     @GetMapping("/posts/{postId}")
-    public ResponseEntity<Post> findPostById(@PathVariable int postId) {
-        Post givenPost = postService.findPostById(postId);
+    public ResponseEntity<PostDTO> findPostById(@PathVariable int postId) {
+        PostDTO givenPost = postService.findPostById(postId);
         return new ResponseEntity<>(givenPost, HttpStatus.OK);
     }
 
     @GetMapping(value = "/posts", params = {"username"})
-    public ResponseEntity<List<Post>> findPostsByUser(@RequestParam(value = "username") String username) {
-        List<Post> givenPosts = postService.findPostsByUser(username);
+    public ResponseEntity<List<PostDTO>> findPostsByUser(@RequestParam(value = "username") String username) {
+        List<PostDTO> givenPosts = postService.findPostsByUser(username);
         return new ResponseEntity<>(givenPosts, HttpStatus.OK);
     }
 
     @PostMapping("/posts")
-    public ResponseEntity<Post> createNewPost(@RequestBody Post newPost) {
-        Post createdPost = postService.createPost(newPost);
+    public ResponseEntity<PostDTO> createNewPost(@RequestBody PostDTO newPost) {
+        PostDTO createdPost = postService.createPost(newPost);
         return new ResponseEntity<>(createdPost, HttpStatus.CREATED);
     }
 
     @PutMapping("/posts/{postId}")
-    public ResponseEntity<Post> updateExistingPost(@PathVariable int postId, @RequestBody Post newPost) {
-        Post updatedPost = postService.updatePostById(postId, newPost);
+    public ResponseEntity<PostDTO> updateExistingPost(@PathVariable int postId, @RequestBody PostDTO newPost) {
+        PostDTO updatedPost = postService.updatePostById(postId, newPost);
         return new ResponseEntity<>(updatedPost, HttpStatus.OK);
     }
 

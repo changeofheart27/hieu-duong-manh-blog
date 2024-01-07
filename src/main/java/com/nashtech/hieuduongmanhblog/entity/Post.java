@@ -2,8 +2,6 @@ package com.nashtech.hieuduongmanhblog.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import org.hibernate.annotations.DynamicUpdate;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -41,6 +39,14 @@ public class Post {
 
     public Post() {
 
+    }
+
+    // constructor used for DTO
+    public Post(Integer id, String title, String description, String content) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.content = content;
     }
 
     public Post(Integer id, String title, String description, String content, LocalDate createdAt, User user) {

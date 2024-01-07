@@ -1,19 +1,19 @@
 package com.nashtech.hieuduongmanhblog.service;
 
-import com.nashtech.hieuduongmanhblog.entity.Post;
+import com.nashtech.hieuduongmanhblog.dto.PostDTO;
 
 import java.util.List;
 
 public interface PostService {
-    List<Post> getAllPosts();
+    List<PostDTO> getAllPosts();
 
-    Post findPostById(int postId);
+    PostDTO findPostById(int postId);
 
-    List<Post> findPostsByUser(String username);
+    List<PostDTO> findPostsByUser(String username);
 
-    Post createPost(Post newPost);
+    PostDTO createPost(PostDTO newPost);
 
-    Post updatePostById(int postId, Post newPost);
+    PostDTO updatePostById(int postId, PostDTO newPost);
 
     void deletePostById(int postId);
 }

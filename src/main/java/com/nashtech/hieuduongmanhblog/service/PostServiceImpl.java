@@ -1,9 +1,12 @@
 package com.nashtech.hieuduongmanhblog.service;
 
+import com.nashtech.hieuduongmanhblog.dto.PostDTO;
+import com.nashtech.hieuduongmanhblog.dto.PostMapper;
 import com.nashtech.hieuduongmanhblog.entity.Post;
 import com.nashtech.hieuduongmanhblog.entity.User;
 import com.nashtech.hieuduongmanhblog.exception.ResourceNotFoundException;
 import com.nashtech.hieuduongmanhblog.repository.PostRepository;
+import com.nashtech.hieuduongmanhblog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,50 +22,69 @@ import java.util.stream.Collectors;
 @Service
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
     private final UserService userService;
+    private final PostMapper postMapper;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository, UserService userService) {
+    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, UserService userService, PostMapper postMapper) {
         this.postRepository = postRepository;
+        this.userRepository = userRepository;
         this.userService = userService;
+        this.postMapper = postMapper;
     }
 
     @Override
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    public List<PostDTO> getAllPosts() {
+        List<Post> posts =postRepository.findAll();
+        return posts
+                .stream()
+                .map(post -> postMapper.toPostDTO(post))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Post findPostById(int postId) {
+    public PostDTO findPostById(int postId) {
         Optional<Post> optionalPost = postRepository.findById(postId);
         if (optionalPost.isPresent()) {
-            return optionalPost.get();
+            Post foundPost = optionalPost.get();
+            return postMapper.toPostDTO(foundPost);
         } else throw new ResourceNotFoundException("Could not find Post with id - " + postId);
     }
 
     @Override
-    public List<Post> findPostsByUser(String username) {
-        return postRepository.findByUser_Username(username);
+    public List<PostDTO> findPostsByUser(String username) {
+        List<Post> foundPosts = postRepository.findByUser_Username(username);
+        return foundPosts
+                .stream()
+                .map(post -> postMapper.toPostDTO(post))
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public Post createPost(Post newPost) {
+    public PostDTO createPost(PostDTO newPost) {
         // setting id to 0 to avoid passing new post with existing id inside database
         // and a save of new item instead of updating current one
         newPost.setId(0);
-
+        Post postToCreate = postMapper.toPost(newPost);
         UserDetails currentUserInfo = getCurrentLoggedInUser();
-        User currentUser = userService.findUserByUsername(currentUserInfo.getUsername());
-        newPost.setUser(currentUser);
-        newPost.setCreatedAt(LocalDate.now());
-        return postRepository.save(newPost);
+        postToCreate.setCreatedAt(LocalDate.now());
+        postToCreate.setUser((User) currentUserInfo);
+
+        Post createdPost = postRepository.save(postToCreate);
+
+        return postMapper.toPostDTO(createdPost);
     }
 
     @Override
     @Transactional
-    public Post updatePostById(int postId, Post newPost) {
-        Post postToUpdate = findPostById(postId);
+    public PostDTO updatePostById(int postId, PostDTO newPost) {
+        Post postToUpdate = postRepository
+                .findById(postId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Could not find Post with id - " + postId)
+                );
         UserDetails currentUserInfo = getCurrentLoggedInUser();
         String currentUserRole = currentUserInfo.getAuthorities()
                 .stream()
@@ -76,22 +98,18 @@ public class PostServiceImpl implements PostService {
             }
         }
 
-        if (newPost.getTitle() != null) {
-            postToUpdate.setTitle(newPost.getTitle());
-        }
-        if (newPost.getDescription() != null) {
-            postToUpdate.setDescription(newPost.getDescription());
-        }
-        if (newPost.getContent() != null) {
-            postToUpdate.setContent(newPost.getContent());
-        }
-        return postRepository.save(postToUpdate);
+        Post updatedPost = postRepository.save(postMapper.updatePostFromPostDTO(newPost, postToUpdate));
+        return postMapper.toPostDTO(updatedPost);
     }
 
     @Override
     @Transactional
     public void deletePostById(int postId) {
-        Post postToDelete = findPostById(postId);
+        Post postToDelete = postRepository
+                .findById(postId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Could not find Post with id - " + postId)
+                );
         UserDetails currentUserInfo = getCurrentLoggedInUser();
         String currentUserRole = currentUserInfo.getAuthorities()
                 .stream()
@@ -104,7 +122,7 @@ public class PostServiceImpl implements PostService {
                 throw new RuntimeException("Unable to delete Post by user - " + postAuthor);
             }
         }
-        postRepository.deleteById(postId);
+        postRepository.delete(postToDelete);
     }
 
     private UserDetails getCurrentLoggedInUser() {
