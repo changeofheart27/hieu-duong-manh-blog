@@ -1,7 +1,11 @@
 package com.nashtech.hieuduongmanhblog.dto;
 
+import com.nashtech.hieuduongmanhblog.entity.Role;
 import com.nashtech.hieuduongmanhblog.entity.User;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserMapper {
@@ -11,8 +15,7 @@ public class UserMapper {
                 user.getUsername(),
                 user.getDob(),
                 user.getEmail(),
-                user.getCreatedAt(),
-                user.getRoles()
+                mapRoles(user.getRoles())
         );
     }
 
@@ -26,10 +29,11 @@ public class UserMapper {
         if (userDTO.getEmail() != null && userDTO.getEmail().length() != 0) {
             existingUser.setEmail(userDTO.getEmail());
         }
-        if (userDTO.getRoles() != null && !userDTO.getRoles().isEmpty()) {
-            existingUser.setRoles(userDTO.getRoles());
-        }
 
         return existingUser;
+    }
+
+    public String mapRoles(Set<Role> roles) {
+        return roles.stream().map(role -> role.getName()).collect(Collectors.joining(","));
     }
 }

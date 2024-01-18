@@ -60,9 +60,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO updateUserById(int userId, UserDTO newUser) {
         User userToUpdate = userRepository
                 .findById(userId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Could not find User with id - " + userId)
-                );
+                .orElseThrow(() -> new ResourceNotFoundException("Could not find User with id - " + userId));
         UserDetails currentUserInfo = getCurrentLoggedInUser();
         String currentUserRole = currentUserInfo.getAuthorities()
                 .stream()
@@ -84,9 +82,7 @@ public class UserServiceImpl implements UserService {
     public void deleteUserById(int userId) {
         User userToDelete = userRepository
                 .findById(userId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Could not find User with id - " + userId)
-                );
+                .orElseThrow(() -> new ResourceNotFoundException("Could not find User with id - " + userId));
         UserDetails currentUserInfo = getCurrentLoggedInUser();
         String currentUserRole = currentUserInfo.getAuthorities()
                 .stream()

@@ -2,6 +2,7 @@ package com.nashtech.hieuduongmanhblog.service;
 
 import com.nashtech.hieuduongmanhblog.dto.PostDTO;
 import com.nashtech.hieuduongmanhblog.dto.PostMapper;
+import com.nashtech.hieuduongmanhblog.dto.UserDTO;
 import com.nashtech.hieuduongmanhblog.entity.Post;
 import com.nashtech.hieuduongmanhblog.entity.User;
 import com.nashtech.hieuduongmanhblog.exception.ResourceNotFoundException;
@@ -36,7 +37,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<PostDTO> getAllPosts() {
-        List<Post> posts =postRepository.findAll();
+        List<Post> posts = postRepository.findAll();
         return posts
                 .stream()
                 .map(post -> postMapper.toPostDTO(post))
@@ -61,6 +62,7 @@ public class PostServiceImpl implements PostService {
                 .collect(Collectors.toList());
     }
 
+
     @Override
     @Transactional
     public PostDTO createPost(PostDTO newPost) {
@@ -69,8 +71,11 @@ public class PostServiceImpl implements PostService {
         newPost.setId(0);
         Post postToCreate = postMapper.toPost(newPost);
         UserDetails currentUserInfo = getCurrentLoggedInUser();
+        User user = userRepository
+                .findByUsername(currentUserInfo.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("Could not find User with username - " + currentUserInfo.getUsername()));
         postToCreate.setCreatedAt(LocalDate.now());
-        postToCreate.setUser((User) currentUserInfo);
+        postToCreate.setUser(user);
 
         Post createdPost = postRepository.save(postToCreate);
 
@@ -107,9 +112,7 @@ public class PostServiceImpl implements PostService {
     public void deletePostById(int postId) {
         Post postToDelete = postRepository
                 .findById(postId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Could not find Post with id - " + postId)
-                );
+                .orElseThrow(() -> new ResourceNotFoundException("Could not find Post with id - " + postId));
         UserDetails currentUserInfo = getCurrentLoggedInUser();
         String currentUserRole = currentUserInfo.getAuthorities()
                 .stream()
@@ -125,7 +128,7 @@ public class PostServiceImpl implements PostService {
         postRepository.delete(postToDelete);
     }
 
-    private UserDetails getCurrentLoggedInUser() {
+    protected UserDetails getCurrentLoggedInUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return (UserDetails) auth.getPrincipal();
     }

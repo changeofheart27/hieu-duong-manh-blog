@@ -1,29 +1,23 @@
 package com.nashtech.hieuduongmanhblog.dto;
 
-import com.nashtech.hieuduongmanhblog.entity.Role;
-import jakarta.persistence.*;
-
 import java.time.LocalDate;
-import java.util.Set;
 
 public class UserDTO {
     private Integer id;
     private String username;
     private LocalDate dob;
     private String email;
-    private LocalDate createdAt;
-    private Set<Role> roles;
+    private String roles;
 
     public UserDTO() {
 
     }
 
-    public UserDTO(Integer id, String username, LocalDate dob, String email, LocalDate createdAt, Set<Role> roles) {
+    public UserDTO(Integer id, String username, LocalDate dob, String email, String roles) {
         this.id = id;
         this.username = username;
         this.dob = dob;
         this.email = email;
-        this.createdAt = createdAt;
         this.roles = roles;
     }
 
@@ -59,19 +53,11 @@ public class UserDTO {
         this.email = email;
     }
 
-    public LocalDate getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Set<Role> getRoles() {
+    public String getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<Role> roles) {
+    public void setRoles(String roles) {
         this.roles = roles;
     }
 }

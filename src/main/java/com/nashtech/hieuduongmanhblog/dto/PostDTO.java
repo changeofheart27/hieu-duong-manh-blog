@@ -1,7 +1,5 @@
 package com.nashtech.hieuduongmanhblog.dto;
 
-import com.nashtech.hieuduongmanhblog.entity.User;
-
 import java.time.LocalDate;
 
 public class PostDTO {
@@ -10,18 +8,18 @@ public class PostDTO {
     private String description;
     private String content;
     private LocalDate createdAt;
-    private UserDTO userDTO;
+    private String postAuthor;
 
     public PostDTO() {
 
     }
 
-    public PostDTO(Integer id, String title, String description, String content, LocalDate createdAt) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.content = content;
-        this.createdAt = createdAt;
+    public PostDTO(Integer id, String title, String description, String content, String postAuthor) {
+            this.id = id;
+            this.title = title;
+            this.description = description;
+            this.content = content;
+            this.postAuthor = postAuthor;
     }
 
     public Integer getId() {
@@ -64,11 +62,11 @@ public class PostDTO {
         this.createdAt = createdAt;
     }
 
-    public UserDTO getUserDTO() {
-        return userDTO;
+    public String getPostAuthor() {
+        return postAuthor;
     }
 
-    public void setUserDTO(UserDTO userDTO) {
-        this.userDTO = userDTO;
+    public void setPostAuthor(String postAuthor) {
+        this.postAuthor = postAuthor;
     }
 }

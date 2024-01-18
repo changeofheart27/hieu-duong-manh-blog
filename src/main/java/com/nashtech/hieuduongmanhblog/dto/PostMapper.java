@@ -4,8 +4,6 @@ import com.nashtech.hieuduongmanhblog.entity.Post;
 import com.nashtech.hieuduongmanhblog.entity.User;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-
 @Service
 public class PostMapper {
     private final UserMapper userMapper;
@@ -15,16 +13,15 @@ public class PostMapper {
     }
 
     public PostDTO toPostDTO(Post post) {
-        PostDTO postDTO = new PostDTO(
-                post.getId(),
-                post.getTitle(),
-                post.getDescription(),
-                post.getContent(),
-                post.getCreatedAt()
-        );
-        User postAuthor = post.getUser();
-        if (postAuthor != null) {
-            postDTO.setUserDTO(userMapper.toUserDTO(post.getUser()));
+        PostDTO postDTO = new PostDTO();
+        postDTO.setId(post.getId());
+        postDTO.setTitle(post.getTitle());
+        postDTO.setDescription(post.getDescription());
+        postDTO.setContent(post.getContent());
+        postDTO.setCreatedAt(post.getCreatedAt());
+        User user = post.getUser();
+        if (user != null) {
+            postDTO.setPostAuthor(user.getUsername());
         }
         return postDTO;
     }
