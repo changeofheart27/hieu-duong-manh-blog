@@ -96,7 +96,9 @@ public class UserServiceImpl implements UserService {
         }
         // remove associated references to current user
         List<Post> postsByUser = userToDelete.getPosts();
-        postsByUser.forEach(post -> post.setUser(null));
+        if (postsByUser.size() != 0) {
+            postsByUser.forEach(post -> post.setUser(null));
+        }
 
         userRepository.delete(userToDelete);
     }

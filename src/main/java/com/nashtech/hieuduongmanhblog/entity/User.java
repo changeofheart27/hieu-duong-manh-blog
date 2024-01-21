@@ -59,13 +59,14 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
-    public User(Integer id, String username, String password, LocalDate dob, String email, LocalDate createdAt) {
+    public User(Integer id, String username, String password, LocalDate dob, String email, LocalDate createdAt, Set<Role> roles) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.dob = dob;
         this.email = email;
         this.createdAt = createdAt;
+        this.roles = roles;
     }
 
     public Integer getId() {

@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
-public class PostServiceImplUnitTest {
+public class PostServiceImplTest {
     @Mock
     private PostRepository postRepository;
 
@@ -52,7 +52,7 @@ public class PostServiceImplUnitTest {
     @BeforeEach
     void setUp() {
         // prepare data to test
-        user = new User(1, "username", "password", LocalDate.of(1999, 7, 2), "username@email.com", LocalDate.now());
+        user = new User(1, "username", "password", LocalDate.of(1999, 7, 2), "username@email.com", LocalDate.now(), null);
         Post post1 = new Post(1, "Title 1", "Description 1", "Content 1", LocalDate.now(), user);
         Post post2 = new Post(2, "Title 2", "Description 2", "Content 2", LocalDate.now(), user);
         Post post3 = new Post(3, "Title 3", "Description 3", "Content 3", LocalDate.now(), null);
@@ -263,5 +263,15 @@ public class PostServiceImplUnitTest {
         Assertions.assertNull(postServiceImpl.findPostById(1), "Should not return any Post");
 
         Mockito.verify(this.postRepository, Mockito.times(1)).delete(this.posts.get(0));
+    }
+
+    @Test
+    @DisplayName("Delete Existing Post Should Throw Exception")
+    void testDeletePostFailed() {
+        Mockito.doThrow(new ResourceNotFoundException("Could not find Post with id - 0")).when(postRepository).findById(0);
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> { postServiceImpl.deletePostById(0); }, "Should throw exception");
+
+        Mockito.verify(this.postRepository, Mockito.times(1)).findById(0);
     }
 }

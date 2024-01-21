@@ -10,6 +10,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -19,7 +21,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestPropertySource("classpath:application-test.properties")
 public class PostControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
@@ -50,8 +52,7 @@ public class PostControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("HTTP GET REQUEST To Get All Post")
-    @Order(1)
+    @DisplayName("GET OPERATION: Get All Posts")
     void testGetAllPosts() throws Exception {
         this.mockMvc.perform(
                 MockMvcRequestBuilders
@@ -61,16 +62,15 @@ public class PostControllerIntegrationTest {
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(5)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("Java 17 New Features"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].description").value("Java 17, the latest (3rd) LTS, was released on September 14, 2021. What are the new features? Find out now."))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].content").value("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sed eleifend odio. Nam sodales diam efficitur convallis porttitor. In vel arcu nibh. Quisque vel volutpat urna, ac viverra neque. Suspendisse pellentesque feugiat augue. Ut porttitor purus id urna condimentum, non dapibus arcu dignissim. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tincidunt magna vitae faucibus mattis. Ut lacinia nisi non quam pharetra, id cursus purus commodo. Duis et lobortis nibh, et viverra odio. Maecenas blandit posuere velit, id hendrerit leo euismod non. Suspendisse aliquet lorem libero, at maximus odio scelerisque vitae. Sed urna leo, molestie eget fermentum gravida, consequat nec lectus. Maecenas id laoreet ligula. Morbi magna tellus, fermentum non elementum at, viverra a metus. Ut sed velit sollicitudin, rhoncus nisi eu, ultricies diam."));
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("Demo Post Title 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].description").value("Demo Post Description 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].content").value("Demo Post Content 1"));
     }
 
     @Test
-    @DisplayName("HTTP GET REQUEST To Get Post By Id Should Return A Valid Post")
-    @Order(2)
+    @DisplayName("GET OPERATION: Find Post By Id Should Return A Valid Post")
     void testFindPostByIdSuccess() throws Exception {
         this.mockMvc.perform(
                         MockMvcRequestBuilders
@@ -81,14 +81,13 @@ public class PostControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Java 17 New Features"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("Java 17, the latest (3rd) LTS, was released on September 14, 2021. What are the new features? Find out now."))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sed eleifend odio. Nam sodales diam efficitur convallis porttitor. In vel arcu nibh. Quisque vel volutpat urna, ac viverra neque. Suspendisse pellentesque feugiat augue. Ut porttitor purus id urna condimentum, non dapibus arcu dignissim. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tincidunt magna vitae faucibus mattis. Ut lacinia nisi non quam pharetra, id cursus purus commodo. Duis et lobortis nibh, et viverra odio. Maecenas blandit posuere velit, id hendrerit leo euismod non. Suspendisse aliquet lorem libero, at maximus odio scelerisque vitae. Sed urna leo, molestie eget fermentum gravida, consequat nec lectus. Maecenas id laoreet ligula. Morbi magna tellus, fermentum non elementum at, viverra a metus. Ut sed velit sollicitudin, rhoncus nisi eu, ultricies diam."));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Demo Post Title 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("Demo Post Description 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("Demo Post Content 1"));
     }
 
     @Test
-    @DisplayName("HTTP GET REQUEST To Get Post By Id Should Throw Exception")
-    @Order(3)
+    @DisplayName("GET OPERATION: Find Post By Id Should Throw Exception")
     void testFindPostByIdFailed() throws Exception {
         this.mockMvc.perform(
                         MockMvcRequestBuilders
@@ -103,8 +102,7 @@ public class PostControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("HTTP GET REQUEST To Get Post By User username Should Return List Of Valid Posts")
-    @Order(4)
+    @DisplayName("GET OPERATION: Find Posts By User username Should Return List Of Valid Posts")
     void testFindPostByUserSuccess() throws Exception {
         this.mockMvc.perform(
                         MockMvcRequestBuilders
@@ -121,8 +119,7 @@ public class PostControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("HTTP GET REQUEST To Get Post By User username Should Return List Of Empty Post")
-    @Order(5)
+    @DisplayName("GET OPERATION: Find Posts By User username Should Return List Of Empty Post")
     void testFindPostByUserFailed() throws Exception {
         this.mockMvc.perform(
                         MockMvcRequestBuilders
@@ -137,13 +134,14 @@ public class PostControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("HTTP POST REQUEST To Create A New Post")
-    @Order(6)
+    @DisplayName("POST OPERATION: Create A New Post")
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void testCreateNewPost() throws Exception {
         PostDTO createdPostDTO = new PostDTO();
-        createdPostDTO.setTitle("Spring Boot Unit testing with JUnit and Mockito");
-        createdPostDTO.setDescription("In this tutorial we will learn how to perform unit testing Spring boot CRUD RESTful web services using JUnit 5 and Mockito framework.");
-        createdPostDTO.setContent("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum tempor sagittis enim, a accumsan lorem laoreet sit amet. Maecenas pharetra rutrum tempus. Pellentesque dapibus dolor ut lorem sagittis pulvinar. Mauris pellentesque varius quam. Morbi viverra dolor rutrum lorem consequat scelerisque nec vitae ex. Praesent accumsan, odio ac posuere ultricies, arcu sem malesuada metus, id malesuada arcu enim eu neque. Proin at lacinia orci, at sodales est. Nulla sollicitudin placerat tristique. Vivamus a dolor at lacus pharetra faucibus. Etiam et eleifend dui. Sed finibus nibh velit, non laoreet erat lobortis non. Sed commodo metus mi, at consectetur est aliquet in. In scelerisque vestibulum metus. Sed convallis magna et bibendum finibus.");
+        createdPostDTO.setId(6);
+        createdPostDTO.setTitle("Demo New Post Title 6");
+        createdPostDTO.setDescription("Demo New Post Description 6");
+        createdPostDTO.setContent("Demo New Post Content 6");
 
         this.mockMvc.perform(
                         MockMvcRequestBuilders
@@ -161,7 +159,7 @@ public class PostControllerIntegrationTest {
 
         this.mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/api/v1/posts/4")
+                        .get("/api/v1/posts/6")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, this.jwtToken)
                 )
@@ -169,17 +167,16 @@ public class PostControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("HTTP PUT REQUEST To Update Existing Post Should Return Updated Post")
-    @Order(7)
+    @DisplayName("PUT OPERATION: Update Existing Post Should Return Updated Post")
     void testUpdatePostSuccess() throws Exception {
         PostDTO updatedPostDTO = new PostDTO();
-        updatedPostDTO.setTitle("Spring Boot Unit testing with JUnit and Mockito Edited Title");
-        updatedPostDTO.setDescription("In this tutorial we will learn how to perform unit testing Spring boot CRUD RESTful web services using JUnit 5 and Mockito framework. Edited Description");
-        updatedPostDTO.setContent("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum tempor sagittis enim, a accumsan lorem laoreet sit amet. Maecenas pharetra rutrum tempus. Pellentesque dapibus dolor ut lorem sagittis pulvinar. Mauris pellentesque varius quam. Morbi viverra dolor rutrum lorem consequat scelerisque nec vitae ex. Praesent accumsan, odio ac posuere ultricies, arcu sem malesuada metus, id malesuada arcu enim eu neque. Proin at lacinia orci, at sodales est. Nulla sollicitudin placerat tristique. Vivamus a dolor at lacus pharetra faucibus. Etiam et eleifend dui. Sed finibus nibh velit, non laoreet erat lobortis non. Sed commodo metus mi, at consectetur est aliquet in. In scelerisque vestibulum metus. Sed convallis magna et bibendum finibus. Edited Content");
+        updatedPostDTO.setTitle("Demo Edited Post Title 3");
+        updatedPostDTO.setDescription("Demo Edited Post Description 3");
+        updatedPostDTO.setContent("Demo Edited Post Content 3");
 
         this.mockMvc.perform(
                 MockMvcRequestBuilders
-                        .put("/api/v1/posts/{id}", 4)
+                        .put("/api/v1/posts/{id}", 3)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedPostDTO))
                         .header(HttpHeaders.AUTHORIZATION, this.jwtToken)
@@ -193,7 +190,7 @@ public class PostControllerIntegrationTest {
 
         this.mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/api/v1/posts/4")
+                        .get("/api/v1/posts/3")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, this.jwtToken)
                 )
@@ -201,20 +198,19 @@ public class PostControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("HTTP PUT REQUEST To Update Existing Post Should Throw Exception")
-    @Order(8)
+    @DisplayName("PUT OPERATION: Update Existing Post Should Throw Exception")
     void testUpdatePostFailed() throws Exception {
         PostDTO updatedPostDTO = new PostDTO();
-        updatedPostDTO.setTitle("Spring Boot Unit testing with JUnit and Mockito Edited Title");
-        updatedPostDTO.setDescription("In this tutorial we will learn how to perform unit testing Spring boot CRUD RESTful web services using JUnit 5 and Mockito framework. Edited Description");
-        updatedPostDTO.setContent("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum tempor sagittis enim, a accumsan lorem laoreet sit amet. Maecenas pharetra rutrum tempus. Pellentesque dapibus dolor ut lorem sagittis pulvinar. Mauris pellentesque varius quam. Morbi viverra dolor rutrum lorem consequat scelerisque nec vitae ex. Praesent accumsan, odio ac posuere ultricies, arcu sem malesuada metus, id malesuada arcu enim eu neque. Proin at lacinia orci, at sodales est. Nulla sollicitudin placerat tristique. Vivamus a dolor at lacus pharetra faucibus. Etiam et eleifend dui. Sed finibus nibh velit, non laoreet erat lobortis non. Sed commodo metus mi, at consectetur est aliquet in. In scelerisque vestibulum metus. Sed convallis magna et bibendum finibus. Edited Content");
+        updatedPostDTO.setTitle("Demo Edited Post Title 10");
+        updatedPostDTO.setDescription("Demo Edited Post Description 10");
+        updatedPostDTO.setContent("Demo Edited Post Content 10");
 
         this.mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .put("/api/v1/posts/{id}", 10)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(this.objectMapper.writeValueAsString(updatedPostDTO))
-                                .header(HttpHeaders.AUTHORIZATION, this.jwtToken)
+                MockMvcRequestBuilders
+                        .put("/api/v1/posts/{id}", 10)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(this.objectMapper.writeValueAsString(updatedPostDTO))
+                        .header(HttpHeaders.AUTHORIZATION, this.jwtToken)
                 )
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
@@ -223,14 +219,14 @@ public class PostControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("HTTP DELETE REQUEST To Delete Existing Post Should Return Nothing (Successful)")
-    @Order(9)
+    @DisplayName("DELETE OPERATION: Delete Existing Post Should Return Nothing (Successful)")
     void testDeletePostSuccess() throws Exception {
         this.mockMvc.perform(
                 MockMvcRequestBuilders
                         .delete("/api/v1/posts/{id}", 4)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, this.jwtToken))
+                        .header(HttpHeaders.AUTHORIZATION, this.jwtToken)
+                )
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         this.mockMvc.perform(
@@ -243,5 +239,20 @@ public class PostControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(404)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Could not find Post with id - 4")));
+    }
+
+    @Test
+    @DisplayName("DELETE OPERATION: Delete Existing Post Should Throw Exception")
+    void testDeletePostFailed() throws Exception {
+        this.mockMvc.perform(
+                MockMvcRequestBuilders
+                        .delete("/api/v1/posts/{id}", 10)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, this.jwtToken)
+                )
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(404)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Could not find Post with id - 10")));
     }
 }

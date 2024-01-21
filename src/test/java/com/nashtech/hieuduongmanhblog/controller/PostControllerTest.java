@@ -1,6 +1,5 @@
 package com.nashtech.hieuduongmanhblog.controller;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nashtech.hieuduongmanhblog.dto.PostDTO;
 import com.nashtech.hieuduongmanhblog.entity.User;
@@ -29,7 +28,7 @@ import java.util.List;
 
 @WebMvcTest(PostController.class)
 @AutoConfigureMockMvc(addFilters = false) // Turn off Spring Security
-public class PostControllerUnitTest {
+public class PostControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -54,7 +53,7 @@ public class PostControllerUnitTest {
     void setUp() {
         // prepare data to test
         objectMapper = new ObjectMapper();
-        user = new User(1, "username", "password", LocalDate.of(1999, 7, 2), "username@email.com", LocalDate.now());
+        user = new User(1, "username", "password", LocalDate.of(1999, 7, 2), "username@email.com", LocalDate.now(), null);
         PostDTO post1 = new PostDTO(1, "Title 1", "Description 1", "Content 1", user.getUsername());
         PostDTO post2 = new PostDTO(2, "Title 2", "Description 2", "Content 2", user.getUsername());
         PostDTO post3 = new PostDTO(3, "Title 3", "Description 3", "Content 3", null);
@@ -73,7 +72,7 @@ public class PostControllerUnitTest {
     }
 
     @Test
-    @DisplayName("HTTP GET REQUEST To Get All Post")
+    @DisplayName("GET OPERATION: Get All Posts")
     void testGetAllPosts() throws Exception {
         Mockito.when(postService.getAllPosts()).thenReturn(this.postDTOs);
 
@@ -88,7 +87,7 @@ public class PostControllerUnitTest {
     }
 
     @Test
-    @DisplayName("HTTP GET REQUEST To Get Post By Id Should Return A Valid Post")
+    @DisplayName("GET OPERATION: Find Post By Id Should Return A Valid Post")
     void testFindPostByIdSuccess() throws Exception {
         Mockito.when(postService.findPostById(1)).thenReturn(this.postDTOs.get(0));
 
@@ -102,7 +101,7 @@ public class PostControllerUnitTest {
     }
 
     @Test
-    @DisplayName("HTTP GET REQUEST To Get Post By Id Should Throw Exception")
+    @DisplayName("GET OPERATION: Find Post By Id Should Throw Exception")
     void testFindPostByIdFailed() throws Exception {
         Mockito.when(postService.findPostById(0)).thenThrow(new ResourceNotFoundException("Could not find Post with id - 0"));
 
@@ -114,7 +113,7 @@ public class PostControllerUnitTest {
     }
 
     @Test
-    @DisplayName("HTTP GET REQUEST To Get Post By User username Should Return List Of Valid Posts")
+    @DisplayName("GET OPERATION: Find Posts By User username Should Return List Of Valid Posts")
     void testFindPostByUserSuccess() throws Exception {
         this.postDTOs.remove(2);
         Mockito.when(postService.findPostsByUser("username")).thenReturn(this.postDTOs);
@@ -131,7 +130,7 @@ public class PostControllerUnitTest {
     }
 
     @Test
-    @DisplayName("HTTP GET REQUEST To Get Post By User username Should Return List Of Empty Post")
+    @DisplayName("GET OPERATION: Find Posts By User username Should Return List Of Empty Post")
     void testFindPostByUserFailed() throws Exception {
         Mockito.when(postService.findPostsByUser(ArgumentMatchers.anyString())).thenReturn(new ArrayList<>());
 
@@ -142,7 +141,7 @@ public class PostControllerUnitTest {
     }
 
     @Test
-    @DisplayName("HTTP POST REQUEST To Create A New Post")
+    @DisplayName("POST OPERATION: Create A New Post")
     void testCreateNewPost() throws Exception {
         PostDTO createdPostDTO = new PostDTO();
         createdPostDTO.setId(1);
@@ -173,7 +172,7 @@ public class PostControllerUnitTest {
     }
 
     @Test
-    @DisplayName("HTTP PUT REQUEST To Update Existing Post Should Return Updated Post")
+    @DisplayName("PUT OPERATION: Update Existing Post Should Return Updated Post")
     void testUpdatePostSuccess() throws Exception {
         PostDTO updatedPostDTO = new PostDTO();
         updatedPostDTO.setId(1);
@@ -203,7 +202,7 @@ public class PostControllerUnitTest {
     }
 
     @Test
-    @DisplayName("HTTP PUT REQUEST To Update Existing Post Should Throw Exception")
+    @DisplayName("PUT OPERATION: Update Existing Post Should Throw Exception")
     void testUpdatePostFailed() throws Exception {
         PostDTO updatedPostDTO = new PostDTO();
         updatedPostDTO.setId(1);
@@ -231,11 +230,24 @@ public class PostControllerUnitTest {
     }
 
     @Test
-    @DisplayName("HTTP DELETE REQUEST To Delete Existing Post Should Return Nothing (Successful)")
+    @DisplayName("DELETE OPERATION: Delete Existing Post Should Return Nothing (Successful)")
     void testDeletePostSuccess() throws Exception {
-        Mockito.when(postService.findPostById(1)).thenReturn(this.postDTOs.get(0));
+        Mockito.doNothing().when(postService).deletePostById(1);
 
         this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/posts/{id}", 1))
                 .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    @DisplayName("DELETE OPERATION: Delete Existing Post Should Throw Exception")
+    void testDeletePostFailed() throws Exception {
+        // The mock call MUST use any instead of a concrete object
+        Mockito.doThrow(new ResourceNotFoundException("Could not find Post with id - 0")).when(postService).deletePostById(ArgumentMatchers.anyInt());
+
+        this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/posts/{id}", 0))
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(404)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Could not find Post with id - 0")));
     }
 }
