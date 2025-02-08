@@ -23,36 +23,36 @@ public class PostController {
     @GetMapping(value = "/posts", params = {})
     public ResponseDTO getAllPosts() {
         List<PostDTO> posts = postService.getAllPosts();
-        return new ResponseDTO(HttpStatus.OK, "Get All Posts Successful!", LocalDateTime.now(), posts);
+        return new ResponseDTO(HttpStatus.OK, "Get All Posts Successful", LocalDateTime.now(), posts);
     }
 
     @GetMapping("/posts/{postId}")
     public ResponseDTO findPostById(@PathVariable int postId) {
         PostDTO givenPost = postService.findPostById(postId);
-        return new ResponseDTO(HttpStatus.OK, "Get Post By ID Successful!", LocalDateTime.now(), givenPost);
+        return new ResponseDTO(HttpStatus.OK, "Get Post By ID Successful", LocalDateTime.now(), givenPost);
     }
 
     @GetMapping(value = "/posts", params = {"username"})
     public ResponseDTO findPostsByUser(@RequestParam(value = "username") String username) {
         List<PostDTO> givenPosts = postService.findPostsByUser(username);
-        return new ResponseDTO(HttpStatus.OK, "Get Posts By Username Successful!", LocalDateTime.now(), givenPosts);
+        return new ResponseDTO(HttpStatus.OK, "Get Posts By Username Successful", LocalDateTime.now(), givenPosts);
     }
 
     @PostMapping("/posts")
     public ResponseDTO createNewPost(@RequestBody PostDTO newPost) {
         PostDTO createdPost = postService.createPost(newPost);
-        return new ResponseDTO(HttpStatus.CREATED, "Create New Post Successful!", LocalDateTime.now(), createdPost);
+        return new ResponseDTO(HttpStatus.CREATED, "Create New Post Successful", LocalDateTime.now(), createdPost);
     }
 
     @PutMapping("/posts/{postId}")
     public ResponseDTO updateExistingPost(@PathVariable int postId, @RequestBody PostDTO newPost) {
         PostDTO updatedPost = postService.updatePostById(postId, newPost);
-        return new ResponseDTO(HttpStatus.OK, "Update Post Successful!", LocalDateTime.now(), updatedPost);
+        return new ResponseDTO(HttpStatus.OK, "Update Post Successful", LocalDateTime.now(), updatedPost);
     }
 
     @DeleteMapping("/posts/{postId}")
     public ResponseDTO deleteUserById(@PathVariable int postId) {
         postService.deletePostById(postId);
-        return new ResponseDTO(HttpStatus.OK, "Delete Post Successful!", LocalDateTime.now());
+        return new ResponseDTO(HttpStatus.OK, "Delete Post Successful", LocalDateTime.now());
     }
 }

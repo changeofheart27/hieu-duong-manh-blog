@@ -19,6 +19,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.time.LocalDateTime;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("classpath:application-test.properties")
@@ -36,14 +38,14 @@ public class PostControllerIntegrationTest {
         String loginAccountJson = "{\"username\": \"hieuduongm\",\"password\": \"test@123\"}";
         ResultActions resultActions = this.mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/v1/auth/authenticate")
+                        .post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginAccountJson)
         );
         MvcResult mvcResult = resultActions.andDo(MockMvcResultHandlers.print()).andReturn();
         String jsonContent = mvcResult.getResponse().getContentAsString();
         JSONObject jsonObject = new JSONObject(jsonContent);
-        this.jwtToken = "Bearer " + jsonObject.getString("jwtToken");
+        this.jwtToken = "Bearer " + jsonObject.getString("data");
     }
 
     @AfterEach
@@ -62,11 +64,13 @@ public class PostControllerIntegrationTest {
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(5)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("Demo Post Title 1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].description").value("Demo Post Description 1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].content").value("Demo Post Content 1"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(200)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Get All Posts Successful")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data", Matchers.hasSize(5)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].title").value("Demo Post Title 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].description").value("Demo Post Description 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].content").value("Demo Post Content 1"));
     }
 
     @Test
@@ -80,10 +84,12 @@ public class PostControllerIntegrationTest {
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Demo Post Title 1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("Demo Post Description 1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("Demo Post Content 1"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(200)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Get Post By ID Successful")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value("Demo Post Title 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.description").value("Demo Post Description 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value("Demo Post Content 1"));
     }
 
     @Test
@@ -113,9 +119,11 @@ public class PostControllerIntegrationTest {
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].postAuthor").value("hieuduongm"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(200)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Get Posts By Username Successful")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data", Matchers.hasSize(3)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].postAuthor").value("hieuduongm"));
     }
 
     @Test
@@ -130,7 +138,9 @@ public class PostControllerIntegrationTest {
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(0)));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(200)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Get Posts By Username Successful")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data", Matchers.hasSize(0)));
     }
 
     @Test
@@ -152,10 +162,13 @@ public class PostControllerIntegrationTest {
                 )
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value(createdPostDTO.getTitle()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value(createdPostDTO.getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value(createdPostDTO.getContent()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.postAuthor").value("hieuduongm"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(201)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Create New Post Successful")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(createdPostDTO.getId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value(createdPostDTO.getTitle()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.description").value(createdPostDTO.getDescription()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value(createdPostDTO.getContent()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postAuthor").value("hieuduongm"));
 
         this.mockMvc.perform(
                 MockMvcRequestBuilders
@@ -170,27 +183,31 @@ public class PostControllerIntegrationTest {
     @DisplayName("PUT OPERATION: Update Existing Post Should Return Updated Post")
     void testUpdatePostSuccess() throws Exception {
         PostDTO updatedPostDTO = new PostDTO();
+        updatedPostDTO.setId(3);
         updatedPostDTO.setTitle("Demo Edited Post Title 3");
         updatedPostDTO.setDescription("Demo Edited Post Description 3");
         updatedPostDTO.setContent("Demo Edited Post Content 3");
 
         this.mockMvc.perform(
                 MockMvcRequestBuilders
-                        .put("/api/v1/posts/{id}", 3)
+                        .put("/api/v1/posts/{id}", updatedPostDTO.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedPostDTO))
                         .header(HttpHeaders.AUTHORIZATION, this.jwtToken)
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value(updatedPostDTO.getTitle()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value(updatedPostDTO.getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value(updatedPostDTO.getContent()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.postAuthor").value("hieuduongm"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(200)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Update Post Successful")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(updatedPostDTO.getId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value(updatedPostDTO.getTitle()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.description").value(updatedPostDTO.getDescription()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value(updatedPostDTO.getContent()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postAuthor").value("hieuduongm"));
 
         this.mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/api/v1/posts/3")
+                        .get("/api/v1/posts/{id}", updatedPostDTO.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, this.jwtToken)
                 )

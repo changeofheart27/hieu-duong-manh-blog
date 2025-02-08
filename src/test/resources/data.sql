@@ -22,9 +22,9 @@ INSERT INTO users (username, password, dob, email, created_at) VALUES ('thanhpha
 --
 -- Inserting data for table `roles`
 --
-INSERT INTO roles (id, name) VALUES (1,'ROLE_USER');
-INSERT INTO roles (id, name) VALUES (2,'ROLE_AUTHOR');
-INSERT INTO roles (id, name) VALUES (3,'ROLE_ADMIN');
+INSERT INTO roles (id, role_name) VALUES (1,'ROLE_USER');
+INSERT INTO roles (id, role_name) VALUES (2,'ROLE_AUTHOR');
+INSERT INTO roles (id, role_name) VALUES (3,'ROLE_ADMIN');
 
 --
 -- Inserting data for table `users-roles`
@@ -40,9 +40,9 @@ INSERT INTO `users-roles` (user_id, role_id) VALUES (4,1);
 --
 -- Inserting data for table `tags`
 --
-INSERT INTO tags (id, name) VALUES (1,'#java');
-INSERT INTO tags (id, name) VALUES (2,'#springboot');
-INSERT INTO tags (id, name) VALUES (3,'#database');
+INSERT INTO tags (id, tag_name) VALUES (1,'#java');
+INSERT INTO tags (id, tag_name) VALUES (2,'#springboot');
+INSERT INTO tags (id, tag_name) VALUES (3,'#database');
 
 --
 -- Inserting data for table `posts`

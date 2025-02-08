@@ -1,13 +1,20 @@
 package vn.com.hieuduongmanhblog.dto;
 
-import java.time.LocalDate;
+import jakarta.validation.constraints.NotBlank;
+
+import java.time.LocalDateTime;
 
 public class PostDTO {
     private Integer id;
+    @NotBlank(message = "title cannot be blank")
     private String title;
+    @NotBlank(message = "description cannot be blank")
     private String description;
+    @NotBlank(message = "content cannot be blank")
     private String content;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    @NotBlank(message = "author cannot be blank")
     private String postAuthor;
 
     public PostDTO() {
@@ -15,10 +22,20 @@ public class PostDTO {
     }
 
     public PostDTO(Integer id, String title, String description, String content, String postAuthor) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.content = content;
+        this.postAuthor = postAuthor;
+    }
+
+    public PostDTO(Integer id, String title, String description, String content, LocalDateTime createdAt, LocalDateTime updatedAt, String postAuthor) {
             this.id = id;
             this.title = title;
             this.description = description;
             this.content = content;
+            this.createdAt = createdAt;
+            this.updatedAt = updatedAt;
             this.postAuthor = postAuthor;
     }
 
@@ -54,12 +71,20 @@ public class PostDTO {
         this.content = content;
     }
 
-    public LocalDate getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDate createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public String getPostAuthor() {

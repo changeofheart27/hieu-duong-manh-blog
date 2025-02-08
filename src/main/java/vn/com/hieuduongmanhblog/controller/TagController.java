@@ -1,5 +1,6 @@
 package vn.com.hieuduongmanhblog.controller;
 
+import vn.com.hieuduongmanhblog.dto.ResponseDTO;
 import vn.com.hieuduongmanhblog.entity.Tag;
 import vn.com.hieuduongmanhblog.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -20,32 +22,32 @@ public class TagController {
     }
 
     @GetMapping("/tags")
-    public ResponseEntity<List<Tag>> getAllTags() {
+    public ResponseDTO getAllTags() {
         List<Tag> tags = tagService.getAllTags();
-        return new ResponseEntity<>(tags, HttpStatus.OK);
+        return new ResponseDTO(HttpStatus.OK, "Get All Tags Successful", LocalDateTime.now(), tags);
     }
 
     @GetMapping("/tags/{tagId}")
-    public ResponseEntity<Tag> findTagById(@PathVariable int tagId) {
+    public ResponseDTO findTagById(@PathVariable int tagId) {
         Tag givenTag = tagService.findTagById(tagId);
-        return new ResponseEntity<>(givenTag, HttpStatus.OK);
+        return new ResponseDTO(HttpStatus.OK, "Get Tag By ID Successful", LocalDateTime.now(), givenTag);
     }
 
     @PostMapping("/tags")
-    public ResponseEntity<Tag> createNewTag(@RequestBody Tag newTag) {
+    public ResponseDTO createNewTag(@RequestBody Tag newTag) {
         Tag createdTag = tagService.createTag(newTag);
-        return new ResponseEntity<>(createdTag, HttpStatus.CREATED);
+        return new ResponseDTO(HttpStatus.CREATED, "Create New Tag Successful", LocalDateTime.now(), createdTag);
     }
 
     @PutMapping("/tags/{tagId}")
-    public ResponseEntity<Tag> updateExistingTag(@PathVariable int tagId, @RequestBody Tag newTag) {
+    public ResponseDTO updateExistingTag(@PathVariable int tagId, @RequestBody Tag newTag) {
         Tag updatedTag = tagService.updateTagById(tagId, newTag);
-        return new ResponseEntity<>(updatedTag, HttpStatus.OK);
+        return new ResponseDTO(HttpStatus.OK, "Update Tag Successful", LocalDateTime.now(), updatedTag);
     }
 
     @DeleteMapping("/tags/{tagId}")
-    public ResponseEntity<Void> deleteUserById(@PathVariable int tagId) {
+    public ResponseDTO deleteUserById(@PathVariable int tagId) {
         tagService.deleteTagById(tagId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseDTO(HttpStatus.OK, "Delete Tag Successful", LocalDateTime.now());
     }
 }

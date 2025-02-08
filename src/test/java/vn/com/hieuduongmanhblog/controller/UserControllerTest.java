@@ -2,9 +2,6 @@ package vn.com.hieuduongmanhblog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import vn.com.hieuduongmanhblog.dto.UserDTO;
-import vn.com.hieuduongmanhblog.entity.Post;
-import vn.com.hieuduongmanhblog.entity.Role;
-import vn.com.hieuduongmanhblog.entity.User;
 import vn.com.hieuduongmanhblog.exception.ResourceNotFoundException;
 import vn.com.hieuduongmanhblog.service.JwtUtilService;
 import vn.com.hieuduongmanhblog.service.UserService;
@@ -28,7 +25,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @WebMvcTest(UserController.class)
 @AutoConfigureMockMvc(addFilters = false) // Turn off Spring Security
@@ -37,7 +33,7 @@ public class UserControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private UserService UserService;
+    private UserService userService;
 
     @MockBean
     private JwtUtilService jwtUtilService;
@@ -47,33 +43,18 @@ public class UserControllerTest {
 
     private List<UserDTO> userDTOs;
 
-    private UserDTO userDTOToCreate;
-
-    private UserDTO userDTOToUpdate;
-
-    private Post post;
-
     @BeforeEach
     void setUp() {
         // prepare data to test
-        objectMapper = new ObjectMapper();
-        Role userRole = new Role();
-        userRole.setRoleName("ROLE_USER");
-        Role authorRole = new Role();
-        authorRole.setRoleName("ROLE_AUTHOR");
-        Role adminRole = new Role();
-        adminRole.setRoleName("ROLE_ADMIN");
-        UserDTO user1 = new UserDTO(1, "username1", LocalDate.of(1999, 7, 2), "username1@email.com", LocalDateTime.now(), null, Set.of(userRole, authorRole, adminRole));
-        UserDTO user2 = new UserDTO(2, "username2", null, "username2@email.com", LocalDateTime.now(), null, null);
-        UserDTO user3 = new UserDTO(3, "username3", null, "username3@email.com", LocalDateTime.now(), null, null);
-        post = new Post(3, "Title 3", "Description 3", "Content 3", LocalDateTime.now(), null, null);
+        UserDTO user1 = new UserDTO(1, "username1", LocalDate.of(1999, 7, 2), "username1@email.com", LocalDateTime.now(), null, "ROLE_USER,ROLE_AUTHOR,ROLE_ADMIN");
+        UserDTO user2 = new UserDTO(2, "username2", null, "username2@email.com", LocalDateTime.now(), null, "ROLE_USER");
+        UserDTO user3 = new UserDTO(3, "username3", null, "username3@email.com", LocalDateTime.now(), null, "ROLE_USER");
+        UserDTO user4 = new UserDTO(4, "username4", LocalDate.of(1999, 2, 7), "username4@email.com", LocalDateTime.now(), null, "ROLE_USER");
         userDTOs = new ArrayList<>();
         userDTOs.add(user1);
         userDTOs.add(user2);
         userDTOs.add(user3);
-
-        userDTOToCreate = new UserDTO(1, "New User Title 1", "New User Description 1", "New User Content 1", user.getUsername());
-        userDTOToUpdate = new UserDTO(1, "Updated User Title 1", "Updated User Description 1", "Updated User Content 1", user.getUsername());
+        userDTOs.add(user4);
     }
 
     @AfterEach
@@ -84,39 +65,43 @@ public class UserControllerTest {
     @Test
     @DisplayName("GET OPERATION: Get All Users")
     void testGetAllUsers() throws Exception {
-        Mockito.when(UserService.getAllUsers()).thenReturn(this.userDTOs);
+        Mockito.when(userService.getAllUsers()).thenReturn(this.userDTOs);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/users"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Get All Users Successful!"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Get All Users Successful"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].username").value("username1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].dob").value(LocalDate.of(1999, 7, 2)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].email").value("username1@email.com"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].dob").value(LocalDate.of(1999, 7, 2).toString()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].email").value("username1@email.com"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].roles").isNotEmpty());
     }
 
     @Test
     @DisplayName("GET OPERATION: Find User By Id Should Return A Valid User")
     void testFindUserByIdSuccess() throws Exception {
-        Mockito.when(UserService.findUserById(1)).thenReturn(this.UserDTOs.get(0));
+        Mockito.when(userService.findUserById(1)).thenReturn(this.userDTOs.get(2));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/Users/{id}", 1))
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/users/{id}", 1))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Title 1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("Description 1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("Content 1"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Get User By ID Successful"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(3))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.username").value("username3"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.dob").isEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value("username3@email.com"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.roles").value("ROLE_USER"));
     }
 
     @Test
     @DisplayName("GET OPERATION: Find User By Id Should Throw Exception")
     void testFindUserByIdFailed() throws Exception {
-        Mockito.when(UserService.findUserById(0)).thenThrow(new ResourceNotFoundException("Could not find User with id - 0"));
+        Mockito.when(userService.findUserById(0)).thenThrow(new ResourceNotFoundException("Could not find User with id - 0"));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/Users/{id}", 0))
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/users/{id}", 0))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(404)))
@@ -124,128 +109,82 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("GET OPERATION: Find Users By User username Should Return List Of Valid Users")
+    @DisplayName("GET OPERATION: Find Users By User username Should Return A Valid User")
     void testFindUserByUserSuccess() throws Exception {
-        this.UserDTOs.remove(2);
-        Mockito.when(UserService.findUsersByUser("username")).thenReturn(this.UserDTOs);
+        Mockito.when(userService.findUserByUsername("username2")).thenReturn(this.userDTOs.get(1));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/Users?username={username}", "username"))
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/users?username={username}", "username2"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].id").value(2))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("Title 2"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].description").value("Description 2"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].content").value("Content 2"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].UserAuthor").value("username"));
-    }
-
-    @Test
-    @DisplayName("GET OPERATION: Find Users By User username Should Return List Of Empty User")
-    void testFindUserByUserFailed() throws Exception {
-        Mockito.when(UserService.findUsersByUser(ArgumentMatchers.anyString())).thenReturn(new ArrayList<>());
-
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/Users?username={username}", "username123"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(0)));
-    }
-
-    @Test
-    @DisplayName("User OPERATION: Create A New User")
-    void testCreateNewUser() throws Exception {
-        UserDTO createdUserDTO = new UserDTO();
-        createdUserDTO.setId(1);
-        createdUserDTO.setTitle("New User Title 1");
-        createdUserDTO.setDescription("New User Description 1");
-        createdUserDTO.setContent("New User Content 1");
-        createdUserDTO.setUserAuthor("username");
-
-        // The mock call MUST use any instead of a concrete object
-        Mockito.when(UserService.createUser(ArgumentMatchers.any(UserDTO.class))).thenReturn(createdUserDTO);
-
-
-        this.mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .User("/api/v1/Users")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(UserDTOToCreate))
-                )
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(createdUserDTO.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value(createdUserDTO.getTitle()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value(createdUserDTO.getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value(createdUserDTO.getContent()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.UserAuthor").value(createdUserDTO.getUserAuthor()));
-
-        Mockito.verify(UserService, Mockito.times(1)).createUser(ArgumentMatchers.any(UserDTO.class));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Get User By username Successful"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.username").value("username2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.dob").isEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value("username2@email.com"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.roles").value("ROLE_USER"));
     }
 
     @Test
     @DisplayName("PUT OPERATION: Update Existing User Should Return Updated User")
     void testUpdateUserSuccess() throws Exception {
-        UserDTO updatedUserDTO = new UserDTO();
-        updatedUserDTO.setId(1);
-        updatedUserDTO.setTitle("Updated User Title 1");
-        updatedUserDTO.setDescription("Updated User Description 1");
-        updatedUserDTO.setContent("Updated User Content 1");
-        updatedUserDTO.setUserAuthor("username");
+        UserDTO updatedUserDTO = new UserDTO(4, "username4", LocalDate.of(1999, 2, 7), "updatedusername4@email.com", LocalDateTime.now(), LocalDateTime.now(), "ROLE_USER");
 
         // The mock call MUST use any instead of a concrete object
-        Mockito.when(UserService.updateUserById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(UserDTO.class))).thenReturn(updatedUserDTO);
+        Mockito.when(userService.updateUserById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(UserDTO.class))).thenReturn(updatedUserDTO);
 
         this.mockMvc.perform(
                         MockMvcRequestBuilders
-                                .put("/api/v1/Users/{id}", 1)
+                                .put("/api/v1/users/{id}", 4)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(this.objectMapper.writeValueAsString(UserDTOToUpdate))
+                                .content(objectMapper.writeValueAsString(updatedUserDTO))
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(updatedUserDTO.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value(updatedUserDTO.getTitle()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value(updatedUserDTO.getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value(updatedUserDTO.getContent()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.UserAuthor").value(updatedUserDTO.getUserAuthor()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(updatedUserDTO.getId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.username").value(updatedUserDTO.getUsername()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.dob").value(updatedUserDTO.getDob().toString()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value(updatedUserDTO.getEmail()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.roles").value(updatedUserDTO.getRoles()));
 
-        Mockito.verify(UserService, Mockito.times(1)).updateUserById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(UserDTO.class));
+        Mockito.verify(userService, Mockito.times(1)).updateUserById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(UserDTO.class));
     }
 
     @Test
     @DisplayName("PUT OPERATION: Update Existing User Should Throw Exception")
     void testUpdateUserFailed() throws Exception {
-        UserDTO updatedUserDTO = new UserDTO();
-        updatedUserDTO.setId(1);
-        updatedUserDTO.setTitle("Updated User Title 1");
-        updatedUserDTO.setDescription("Updated User Description 1");
-        updatedUserDTO.setContent("Updated User Content 1");
-        updatedUserDTO.setUserAuthor("username");
+        UserDTO invalidUserDTO = new UserDTO();
+        invalidUserDTO.setId(0);
+        invalidUserDTO.setUsername("username0");
+        invalidUserDTO.setDob(LocalDate.of(2024, 6, 5));
+        invalidUserDTO.setEmail("username0@email.com");
+        invalidUserDTO.setCreatedAt(LocalDateTime.now());
+        invalidUserDTO.setRoles("USER_ROLE");
 
         // The mock call MUST use any instead of a concrete object
-        Mockito.when(UserService.updateUserById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(UserDTO.class)))
+        Mockito.when(userService.updateUserById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(UserDTO.class)))
                 .thenThrow(new ResourceNotFoundException("Could not find User with id - 0"));
 
         this.mockMvc.perform(
                         MockMvcRequestBuilders
-                                .put("/api/v1/Users/{id}", 0)
+                                .put("/api/v1/users/{id}", 0)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(this.objectMapper.writeValueAsString(UserDTOToUpdate))
+                                .content(objectMapper.writeValueAsString(invalidUserDTO))
                 )
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(404)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Could not find User with id - 0")));
 
-        Mockito.verify(UserService, Mockito.times(1)).updateUserById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(UserDTO.class));
+        Mockito.verify(userService, Mockito.times(1)).updateUserById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(UserDTO.class));
     }
 
     @Test
     @DisplayName("DELETE OPERATION: Delete Existing User Should Return Nothing (Successful)")
     void testDeleteUserSuccess() throws Exception {
-        Mockito.doNothing().when(UserService).deleteUserById(1);
+        Mockito.doNothing().when(userService).deleteUserById(1);
 
-        this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/Users/{id}", 1))
+        this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/users/{id}", 1))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
@@ -253,9 +192,9 @@ public class UserControllerTest {
     @DisplayName("DELETE OPERATION: Delete Existing User Should Throw Exception")
     void testDeleteUserFailed() throws Exception {
         // The mock call MUST use any instead of a concrete object
-        Mockito.doThrow(new ResourceNotFoundException("Could not find User with id - 0")).when(UserService).deleteUserById(ArgumentMatchers.anyInt());
+        Mockito.doThrow(new ResourceNotFoundException("Could not find User with id - 0")).when(userService).deleteUserById(ArgumentMatchers.anyInt());
 
-        this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/Users/{id}", 0))
+        this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/users/{id}", 0))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(404)))

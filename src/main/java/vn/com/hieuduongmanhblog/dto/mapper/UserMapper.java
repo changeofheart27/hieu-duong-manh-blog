@@ -5,6 +5,7 @@ import vn.com.hieuduongmanhblog.entity.Role;
 import vn.com.hieuduongmanhblog.entity.User;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,20 +24,21 @@ public class UserMapper {
     }
 
     public User updateUserFromUserDTO(UserDTO userDTO, User existingUser) {
-        if (userDTO.getUsername() != null && userDTO.getUsername().length() != 0) {
-            existingUser.setUsername(userDTO.getUsername());
-        }
-        if (userDTO.getDob() != null && userDTO.getDob().toString().length() != 0) {
+        if (userDTO.getDob() != null && !userDTO.getDob().toString().isEmpty()) {
             existingUser.setDob(userDTO.getDob());
         }
-        if (userDTO.getEmail() != null && userDTO.getEmail().length() != 0) {
+        if (userDTO.getEmail() != null && !userDTO.getEmail().isEmpty()) {
             existingUser.setEmail(userDTO.getEmail());
         }
+        existingUser.setUpdatedAt(LocalDateTime.now());
 
         return existingUser;
     }
 
     public String mapRoles(Set<Role> roles) {
-        return roles.stream().map(role -> role.getRoleName()).collect(Collectors.joining(","));
+        return roles
+                .stream()
+                .map(role -> role.getRoleName())
+                .collect(Collectors.joining(","));
     }
 }

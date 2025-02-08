@@ -16,12 +16,12 @@ import org.springframework.stereotype.Component;
 public class LoggingAspect {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Pointcut("execution(public * com.nashtech.hieuduongmanhblog.service.*Impl.*(..))")
+    @Pointcut("execution(public * vn.com.hieuduongmanhblog.service.impl.*.*(..))")
     public void allMethodsInsideServicePackagePointcut() {}
 
-    @Pointcut("execution(* com.nashtech.hieuduongmanhblog.repository.*.*(..)) " +
-            "|| execution(* com.nashtech.hieuduongmanhblog.service.*.*(..)) " +
-            "|| execution(* com.nashtech.hieuduongmanhblog.controller.*.*(..))")
+    @Pointcut("execution(* vn.com.hieuduongmanhblog.repository.*.*(..)) " +
+            "|| execution(* vn.com.hieuduongmanhblog.service.*.*(..)) " +
+            "|| execution(* vn.com.hieuduongmanhblog.controller.*.*(..))")
     public void mainMethodsInsidePackagePointcut() {}
 
     @Around("mainMethodsInsidePackagePointcut()")
@@ -35,7 +35,7 @@ public class LoggingAspect {
         long endTime = System.currentTimeMillis();
         long duration = endTime - beginTime;
 
-        logger.info("Execution time of {}.{}(): {} ms!", className, methodName, duration);
+        logger.info("Execution time of {}.{}(): {} ms", className, methodName, duration);
 
         return result;
     }
@@ -49,9 +49,9 @@ public class LoggingAspect {
         String className = methodSignature.getDeclaringType().getSimpleName();
         String methodName = methodSignature.getName();
 
-        logger.info("Method {}.{}() executed successful!", className, methodName);
+        logger.info("Method {}.{}() executed successful", className, methodName);
         if (result != null) {
-            logger.info("Result: {}", result.toString());
+            logger.info("Result: {}", result);
         }
     }
 }

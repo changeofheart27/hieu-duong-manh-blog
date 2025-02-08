@@ -11,7 +11,7 @@ public class UserDTO {
     @NotBlank(message = "username cannot be blank")
     private String username;
     private LocalDate dob;
-    @Pattern(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$", message = "email is not valid")
+    @Pattern(regexp = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$", message = "email is not valid")
     private String email;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

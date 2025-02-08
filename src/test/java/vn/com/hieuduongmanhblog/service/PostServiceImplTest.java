@@ -55,16 +55,16 @@ public class PostServiceImplTest {
     void setUp() {
         // prepare data to test
         user = new User(1, "username", "password", LocalDate.of(1999, 7, 2), "username@email.com", LocalDateTime.now(), null, null);
-        Post post1 = new Post(1, "Title 1", "Description 1", "Content 1", LocalDate.now(), user);
-        Post post2 = new Post(2, "Title 2", "Description 2", "Content 2", LocalDate.now(), user);
-        Post post3 = new Post(3, "Title 3", "Description 3", "Content 3", LocalDate.now(), null);
+        Post post1 = new Post(1, "Title 1", "Description 1", "Content 1", LocalDateTime.now(), LocalDateTime.now(), user);
+        Post post2 = new Post(2, "Title 2", "Description 2", "Content 2", LocalDateTime.now(), LocalDateTime.now(), user);
+        Post post3 = new Post(3, "Title 3", "Description 3", "Content 3", LocalDateTime.now(), LocalDateTime.now(), null);
         posts = new ArrayList<>();
         posts.add(post1);
         posts.add(post2);
         posts.add(post3);
 
-        postToCreate = new Post(1, "New Post Title 1", "New Post Description 1", "New Post Content 1", LocalDate.now(), user);
-        postToUpdate = new Post(1, "Updated Post Title 1", "Updated Post Description 1", "Updated Post Content 1", LocalDate.now(), user);
+        postToCreate = new Post(1, "New Post Title 1", "New Post Description 1", "New Post Content 1", LocalDateTime.now(), LocalDateTime.now(), user);
+        postToUpdate = new Post(1, "Updated Post Title 1", "Updated Post Description 1", "Updated Post Content 1", LocalDateTime.now(), LocalDateTime.now(), user);
     }
 
     @AfterEach

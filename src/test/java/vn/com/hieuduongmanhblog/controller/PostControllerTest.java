@@ -2,6 +2,7 @@ package vn.com.hieuduongmanhblog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import vn.com.hieuduongmanhblog.dto.PostDTO;
+import vn.com.hieuduongmanhblog.entity.Role;
 import vn.com.hieuduongmanhblog.entity.User;
 import vn.com.hieuduongmanhblog.exception.ResourceNotFoundException;
 import vn.com.hieuduongmanhblog.service.JwtUtilService;
@@ -26,6 +27,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @WebMvcTest(PostController.class)
 @AutoConfigureMockMvc(addFilters = false) // Turn off Spring Security
@@ -44,17 +46,11 @@ public class PostControllerTest {
 
     private List<PostDTO> postDTOs;
 
-    private PostDTO postDTOToCreate;
-
-    private PostDTO postDTOToUpdate;
-
-    private User user;
-
     @BeforeEach
     void setUp() {
         // prepare data to test
         objectMapper = new ObjectMapper();
-        user = new User(1, "username", "password", LocalDate.of(1999, 7, 2), "username@email.com", LocalDateTime.now(), null, null);
+        User user = new User(1, "username", "password", LocalDate.of(1999, 7, 2), "username@email.com", LocalDateTime.now(), null, Set.of(new Role("ROLE_USER")));
         PostDTO post1 = new PostDTO(1, "Title 1", "Description 1", "Content 1", user.getUsername());
         PostDTO post2 = new PostDTO(2, "Title 2", "Description 2", "Content 2", user.getUsername());
         PostDTO post3 = new PostDTO(3, "Title 3", "Description 3", "Content 3", null);
@@ -62,9 +58,6 @@ public class PostControllerTest {
         postDTOs.add(post1);
         postDTOs.add(post2);
         postDTOs.add(post3);
-
-        postDTOToCreate = new PostDTO(1, "New Post Title 1", "New Post Description 1", "New Post Content 1", user.getUsername());
-        postDTOToUpdate = new PostDTO(1, "Updated Post Title 1", "Updated Post Description 1", "Updated Post Content 1", user.getUsername());
     }
 
     @AfterEach
@@ -80,11 +73,14 @@ public class PostControllerTest {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("Title 1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].description").value("Description 1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].content").value("Content 1"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Get All Posts Successful"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data", Matchers.hasSize(3)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].title").value("Title 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].description").value("Description 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].content").value("Content 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].postAuthor").value("username"));
     }
 
     @Test
@@ -95,10 +91,13 @@ public class PostControllerTest {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts/{id}", 1))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Title 1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("Description 1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("Content 1"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Get Post By ID Successful"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value("Title 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.description").value("Description 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value("Content 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postAuthor").value("username"));
     }
 
     @Test
@@ -122,12 +121,14 @@ public class PostControllerTest {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts?username={username}", "username"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].id").value(2))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("Title 2"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].description").value("Description 2"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].content").value("Content 2"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].postAuthor").value("username"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Get Posts By Username Successful"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data", Matchers.hasSize(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].id").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].title").value("Title 2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].description").value("Description 2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].content").value("Content 2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].postAuthor").value("username"));
     }
 
     @Test
@@ -138,7 +139,9 @@ public class PostControllerTest {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts?username={username}", "username123"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(0)));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Get Posts By Username Successful"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data", Matchers.hasSize(0)));
     }
 
     @Test
@@ -159,15 +162,17 @@ public class PostControllerTest {
                 MockMvcRequestBuilders
                         .post("/api/v1/posts")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(postDTOToCreate))
+                        .content(objectMapper.writeValueAsString(createdPostDTO))
                 )
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(createdPostDTO.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value(createdPostDTO.getTitle()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value(createdPostDTO.getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value(createdPostDTO.getContent()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.postAuthor").value(createdPostDTO.getPostAuthor()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(201))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Create New Post Successful"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(createdPostDTO.getId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value(createdPostDTO.getTitle()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.description").value(createdPostDTO.getDescription()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value(createdPostDTO.getContent()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postAuthor").value(createdPostDTO.getPostAuthor()));
 
         Mockito.verify(postService, Mockito.times(1)).createPost(ArgumentMatchers.any(PostDTO.class));
     }
@@ -189,15 +194,17 @@ public class PostControllerTest {
                 MockMvcRequestBuilders
                         .put("/api/v1/posts/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(this.objectMapper.writeValueAsString(postDTOToUpdate))
+                        .content(this.objectMapper.writeValueAsString(updatedPostDTO))
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(updatedPostDTO.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value(updatedPostDTO.getTitle()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value(updatedPostDTO.getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value(updatedPostDTO.getContent()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.postAuthor").value(updatedPostDTO.getPostAuthor()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Update Post Successful"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(updatedPostDTO.getId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value(updatedPostDTO.getTitle()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.description").value(updatedPostDTO.getDescription()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value(updatedPostDTO.getContent()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postAuthor").value(updatedPostDTO.getPostAuthor()));
 
         Mockito.verify(postService, Mockito.times(1)).updatePostById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(PostDTO.class));
     }
@@ -220,7 +227,7 @@ public class PostControllerTest {
                 MockMvcRequestBuilders
                         .put("/api/v1/posts/{id}", 0)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(this.objectMapper.writeValueAsString(postDTOToUpdate))
+                        .content(this.objectMapper.writeValueAsString(updatedPostDTO))
                 )
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))

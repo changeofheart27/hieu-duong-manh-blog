@@ -20,7 +20,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping(value = "/users", params = {})
+    @GetMapping(value = "/users")
     public ResponseDTO getAllUsers() {
         List<UserDTO> users = userService.getAllUsers();
         return new ResponseDTO(HttpStatus.OK, "Get All Users Successful", LocalDateTime.now(), users);

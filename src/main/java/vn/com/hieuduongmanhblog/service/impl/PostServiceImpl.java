@@ -17,6 +17,7 @@ import vn.com.hieuduongmanhblog.service.PostService;
 import vn.com.hieuduongmanhblog.service.UserService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,14 +26,12 @@ import java.util.stream.Collectors;
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final UserService userService;
     private final PostMapper postMapper;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, UserService userService, PostMapper postMapper) {
+    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, PostMapper postMapper) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
-        this.userService = userService;
         this.postMapper = postMapper;
     }
 
@@ -75,7 +74,7 @@ public class PostServiceImpl implements PostService {
         User user = userRepository
                 .findByUsername(currentUserInfo.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException("Could not find User with username - " + currentUserInfo.getUsername()));
-        postToCreate.setCreatedAt(LocalDate.now());
+        postToCreate.setCreatedAt(LocalDateTime.now());
         postToCreate.setUser(user);
 
         Post createdPost = postRepository.save(postToCreate);
