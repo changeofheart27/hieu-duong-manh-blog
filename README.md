@@ -26,12 +26,12 @@ Welcome to **Hieu Duong Manh Blog**! This is a personal blog website created to 
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/your-username/hieu-duong-manh-blog-backend.git
+    git clone https://github.com/changeofheart27/hieu-duong-manh-blog.git
     ```
 
 2. Navigate to the project directory:
     ```bash
-    cd hieu-duong-manh-blog-backend
+    cd hieu-duong-manh-blog
     ```
 
 3. Build the project:
