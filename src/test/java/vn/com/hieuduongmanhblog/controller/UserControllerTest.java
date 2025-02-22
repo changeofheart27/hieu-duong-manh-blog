@@ -65,7 +65,7 @@ public class UserControllerTest {
     @Test
     @DisplayName("GET OPERATION: Get All Users")
     void testGetAllUsers() throws Exception {
-        Mockito.when(userService.getAllUsers()).thenReturn(this.userDTOs);
+        Mockito.when(userService.getAllUsers(, )).thenReturn(this.userDTOs);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/users"))
                 .andExpect(MockMvcResultMatchers.status().isOk())

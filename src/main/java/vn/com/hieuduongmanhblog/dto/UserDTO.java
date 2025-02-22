@@ -1,51 +1,55 @@
 package vn.com.hieuduongmanhblog.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class UserDTO {
-    private Integer id;
-    @NotBlank(message = "username cannot be blank")
+    @NotNull(message = "username cannot be null")
     private String username;
+
+    @NotNull(message = "dob cannot be null")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @JsonFormat(pattern = "MM/dd/yyyy")
     private LocalDate dob;
+
     @Pattern(regexp = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$", message = "email is not valid")
     private String email;
+
     private LocalDateTime createdAt;
+
     private LocalDateTime updatedAt;
-    @NotBlank(message = "roles cannot be blank")
+
+    private String avatar;
+
+    private String avatarUrl;
+
+    @NotNull(message = "roles cannot be null")
     private String roles;
 
     public UserDTO() {
 
     }
 
-    public UserDTO(Integer id, String username, LocalDate dob, String email, String roles) {
-        this.id = id;
+    public UserDTO(String username, LocalDate dob, String email, String roles) {
         this.username = username;
         this.dob = dob;
         this.email = email;
         this.roles = roles;
     }
 
-    public UserDTO(Integer id, String username, LocalDate dob, String email, LocalDateTime createdAt, LocalDateTime updatedAt, String roles) {
-        this.id = id;
+    public UserDTO(String username, LocalDate dob, String email, LocalDateTime createdAt, LocalDateTime updatedAt, String avatar, String roles) {
         this.username = username;
         this.dob = dob;
         this.email = email;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.avatar = avatar;
         this.roles = roles;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getUsername() {
@@ -86,6 +90,22 @@ public class UserDTO {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     public String getRoles() {

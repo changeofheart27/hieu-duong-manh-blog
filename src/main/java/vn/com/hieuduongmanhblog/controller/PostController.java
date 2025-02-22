@@ -1,5 +1,6 @@
 package vn.com.hieuduongmanhblog.controller;
 
+import org.springframework.data.domain.Page;
 import vn.com.hieuduongmanhblog.dto.PostDTO;
 import vn.com.hieuduongmanhblog.dto.ResponseDTO;
 import vn.com.hieuduongmanhblog.service.PostService;
@@ -8,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -20,9 +20,12 @@ public class PostController {
         this.postService = postService;
     }
 
-    @GetMapping(value = "/posts", params = {})
-    public ResponseDTO getAllPosts() {
-        List<PostDTO> posts = postService.getAllPosts();
+    @GetMapping(value = "/posts")
+    public ResponseDTO getAllPosts(
+            @RequestParam(value = "page", defaultValue = "0", required = false) int pageNumber,
+            @RequestParam(value = "size", defaultValue = "5", required = false) int pageSize
+    ) {
+        Page<PostDTO> posts = postService.getAllPosts(pageNumber, pageSize);
         return new ResponseDTO(HttpStatus.OK, "Get All Posts Successful", LocalDateTime.now(), posts);
     }
 
@@ -33,8 +36,12 @@ public class PostController {
     }
 
     @GetMapping(value = "/posts", params = {"username"})
-    public ResponseDTO findPostsByUser(@RequestParam(value = "username") String username) {
-        List<PostDTO> givenPosts = postService.findPostsByUser(username);
+    public ResponseDTO findPostsByUser(
+            @RequestParam(value = "username") String username,
+            @RequestParam(value = "page", defaultValue = "0", required = false) int pageNumber,
+            @RequestParam(value = "size", defaultValue = "5", required = false) int pageSize
+    ) {
+        Page<PostDTO> givenPosts = postService.findPostsByUser(username, pageNumber, pageSize);
         return new ResponseDTO(HttpStatus.OK, "Get Posts By Username Successful", LocalDateTime.now(), givenPosts);
     }
 

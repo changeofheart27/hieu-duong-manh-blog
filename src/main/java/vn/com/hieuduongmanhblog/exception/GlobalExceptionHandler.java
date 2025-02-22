@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -24,6 +25,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseDTO handleMethodArgumentTypeMismatchExceptionException(MethodArgumentTypeMismatchException exception) {
         return new ResponseDTO(HttpStatus.BAD_REQUEST, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseDTO handleUsernameNotFoundException(UsernameNotFoundException exception) {
+        return new ResponseDTO(HttpStatus.UNAUTHORIZED, exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(BadCredentialsException.class)

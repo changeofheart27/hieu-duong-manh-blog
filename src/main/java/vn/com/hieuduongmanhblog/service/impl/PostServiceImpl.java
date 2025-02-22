@@ -1,5 +1,9 @@
 package vn.com.hieuduongmanhblog.service.impl;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import vn.com.hieuduongmanhblog.dto.PostDTO;
 import vn.com.hieuduongmanhblog.dto.mapper.PostMapper;
 import vn.com.hieuduongmanhblog.entity.Post;
@@ -36,12 +40,16 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDTO> getAllPosts() {
-        List<Post> posts = postRepository.findAll();
-        return posts
+    public Page<PostDTO> getAllPosts(int pageNumber, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
+        Page<Post> postsPage = postRepository.findAll(pageRequest);
+        List<PostDTO> postDTOList = postsPage
+                .getContent()
                 .stream()
-                .map(post -> postMapper.toPostDTO(post))
-                .collect(Collectors.toList());
+                .map(postMapper::toPostDTO)
+                .toList();
+
+        return new PageImpl<>(postDTOList, postsPage.getPageable(), postsPage.getTotalElements());
     }
 
     @Override
@@ -54,12 +62,16 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDTO> findPostsByUser(String username) {
-        List<Post> foundPosts = postRepository.findByUser_Username(username);
-        return foundPosts
+    public Page<PostDTO> findPostsByUser(String username, int pageNumber, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
+        Page<Post> postsPage = postRepository.findByUser_Username(username, pageRequest);
+        List<PostDTO> foundPostDTOList = postsPage
+                .getContent()
                 .stream()
                 .map(post -> postMapper.toPostDTO(post))
-                .collect(Collectors.toList());
+                .toList();
+
+        return new PageImpl<>(foundPostDTOList, postsPage.getPageable(), postsPage.getTotalElements());
     }
 
 

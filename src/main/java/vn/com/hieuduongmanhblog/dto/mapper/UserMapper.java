@@ -6,6 +6,7 @@ import vn.com.hieuduongmanhblog.entity.User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -13,32 +14,44 @@ import java.util.stream.Collectors;
 public class UserMapper {
     public UserDTO toUserDTO(User user) {
         return new UserDTO(
-                user.getId(),
                 user.getUsername(),
                 user.getDob(),
                 user.getEmail(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
+                user.getAvatar(),
                 mapRoles(user.getRoles())
         );
     }
 
-    public User updateUserFromUserDTO(UserDTO userDTO, User existingUser) {
-        if (userDTO.getDob() != null && !userDTO.getDob().toString().isEmpty()) {
-            existingUser.setDob(userDTO.getDob());
-        }
-        if (userDTO.getEmail() != null && !userDTO.getEmail().isEmpty()) {
-            existingUser.setEmail(userDTO.getEmail());
-        }
-        existingUser.setUpdatedAt(LocalDateTime.now());
+    public User toUserEntity(UserDTO userDTO) {
+        User user = new User();
+        user.setUsername(user.getUsername());
+        user.setDob(userDTO.getDob());
+        user.setEmail(userDTO.getEmail());
+        user.setCreatedAt(userDTO.getCreatedAt());
+        user.setUpdatedAt(LocalDateTime.now());
+        user.setAvatar(userDTO.getAvatar());
+        user.setRoles(mapRoles(userDTO.getRoles()));
 
-        return existingUser;
+        return user;
     }
 
     public String mapRoles(Set<Role> roles) {
         return roles
                 .stream()
-                .map(role -> role.getRoleName())
+                .map(Role::getRoleName)
                 .collect(Collectors.joining(","));
+    }
+
+    public Set<Role> mapRoles(String roleNames) {
+        Set<Role> roleSet = new HashSet<>();
+        String[] roleNameArr = roleNames.split(",");
+        for (String roleName : roleNameArr) {
+            Role role = new Role(roleName);
+            roleSet.add(role);
+        }
+
+        return roleSet;
     }
 }

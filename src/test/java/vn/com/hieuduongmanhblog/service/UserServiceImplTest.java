@@ -1,8 +1,11 @@
 package vn.com.hieuduongmanhblog.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import vn.com.hieuduongmanhblog.dto.UserDTO;
 import vn.com.hieuduongmanhblog.dto.mapper.UserMapper;
-import vn.com.hieuduongmanhblog.entity.Post;
 import vn.com.hieuduongmanhblog.entity.Role;
 import vn.com.hieuduongmanhblog.entity.User;
 import vn.com.hieuduongmanhblog.exception.ResourceNotFoundException;
@@ -49,10 +52,10 @@ public class UserServiceImplTest {
         Role adminRole = new Role();
         userRole.setRoleName("ROLE_ADMIN");
         // prepare data to test
-        User user1 = new User(1, "username1", "password1", null, "username1@email.com", LocalDateTime.now(), LocalDateTime.now(), Set.of(userRole, authorRole, adminRole));
-        User user2 = new User(2, "username2", "password2", null, "username2@email.com", LocalDateTime.now(), LocalDateTime.now(), Set.of(userRole, authorRole));
-        User user3 = new User(3, "username3", "password3", null, "username3@email.com", LocalDateTime.now(), LocalDateTime.now(), Set.of(userRole, authorRole));
-        User user4 = new User(4, "username4", "password4", null, "username4@email.com", LocalDateTime.now(), LocalDateTime.now(), Set.of(userRole));
+        User user1 = new User(1, "username1", "password1", null, "username1@email.com", LocalDateTime.now(), LocalDateTime.now(), "avatar1.png", Set.of(userRole, authorRole, adminRole));
+        User user2 = new User(2, "username2", "password2", null, "username2@email.com", LocalDateTime.now(), LocalDateTime.now(), "avatar2.png", Set.of(userRole, authorRole));
+        User user3 = new User(3, "username3", "password3", null, "username3@email.com", LocalDateTime.now(), LocalDateTime.now(), "avatar3.png", Set.of(userRole, authorRole));
+        User user4 = new User(4, "username4", "password4", null, "username4@email.com", LocalDateTime.now(), LocalDateTime.now(), "avatar4.png", Set.of(userRole));
 
         users = new ArrayList<>();
         users.add(user1);
@@ -69,11 +72,24 @@ public class UserServiceImplTest {
     @Test
     @DisplayName("Get All Users Should Return List Of Users")
     void testGetAllUsers() {
-        UserDTO mockUserDTO = Mockito.mock(UserDTO.class);
-        Mockito.when(userRepository.findAll()).thenReturn(this.users);
-        Mockito.when(userMapper.toUserDTO(ArgumentMatchers.any(User.class))).thenReturn(mockUserDTO);
+        int pageNumber = 0;
+        int pageSize = 5;
+        Page<User> usersPage = new PageImpl<>(this.users, PageRequest.of(pageNumber, pageSize), this.users.size());
 
-        List<UserDTO> actualUserDTOs = userServiceImpl.getAllUsers();
+        // mock the repository behavior
+        Mockito.when(userRepository.findAll(ArgumentMatchers.any(Pageable.class))).thenReturn(usersPage);
+        // mock the mapper behavior
+        Mockito.when(userMapper.toUserDTO(ArgumentMatchers.any(User.class))).thenAnswer(invocation -> {
+           User user = invocation.getArgument(0);
+           return new UserDTO(
+                   user.getUsername(),
+                   user.getDob(),
+                   user.getEmail(),
+                   this.userMapper.mapRoles(user.getRoles())
+           );
+        });
+
+        List<UserDTO> actualUserDTOs = userServiceImpl.getAllUsers(, );
 
         Assertions.assertEquals(actualUserDTOs.size(), this.users.size(), "Size should be 4");
 

@@ -1,6 +1,8 @@
 package vn.com.hieuduongmanhblog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import vn.com.hieuduongmanhblog.dto.PostDTO;
 import vn.com.hieuduongmanhblog.entity.Role;
 import vn.com.hieuduongmanhblog.entity.User;
@@ -68,9 +70,17 @@ public class PostControllerTest {
     @Test
     @DisplayName("GET OPERATION: Get All Posts")
     void testGetAllPosts() throws Exception {
-        Mockito.when(postService.getAllPosts()).thenReturn(this.postDTOs);
+        int pageNumber = 0;
+        int pageSize = 5;
+        Page<PostDTO> postDTOsPage = new PageImpl<>(this.postDTOs);
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts"))
+        Mockito.when(
+                postService.getAllPosts(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt())
+        ).thenReturn(postDTOsPage);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts")
+                        .param("page", String.valueOf(pageNumber))
+                        .param("size", String.valueOf(pageSize)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
@@ -116,9 +126,20 @@ public class PostControllerTest {
     @DisplayName("GET OPERATION: Find Posts By User username Should Return List Of Valid Posts")
     void testFindPostByUserSuccess() throws Exception {
         this.postDTOs.remove(2);
-        Mockito.when(postService.findPostsByUser("username")).thenReturn(this.postDTOs);
+        int pageNumber = 0;
+        int pageSize = 5;
+        Page<PostDTO> postDTOsPage = new PageImpl<>(this.postDTOs);
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts?username={username}", "username"))
+        Mockito.when(
+                postService.findPostsByUser(
+                        ArgumentMatchers.anyString(),
+                        ArgumentMatchers.anyInt(),
+                        ArgumentMatchers.anyInt()
+                )).thenReturn(postDTOsPage);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts?username={username}", "username")
+                        .param("page", String.valueOf(pageNumber))
+                        .param("size", String.valueOf(pageSize)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
@@ -134,9 +155,19 @@ public class PostControllerTest {
     @Test
     @DisplayName("GET OPERATION: Find Posts By User username Should Return List Of Empty Post")
     void testFindPostByUserFailed() throws Exception {
-        Mockito.when(postService.findPostsByUser(ArgumentMatchers.anyString())).thenReturn(new ArrayList<>());
+        int pageNumber = 0;
+        int pageSize = 5;
+        Page<PostDTO> postDTOsPage = new PageImpl<>(new ArrayList<>());
+        Mockito.when(
+                postService.findPostsByUser(
+                        ArgumentMatchers.anyString(),
+                        ArgumentMatchers.anyInt(),
+                        ArgumentMatchers.anyInt()
+                )).thenReturn(postDTOsPage);
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts?username={username}", "username123"))
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts?username={username}", "username123")
+                        .param("page", String.valueOf(pageNumber))
+                        .param("size", String.valueOf(pageSize)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))

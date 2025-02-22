@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Service
-public class JwtAuthenticationService implements AuthenticationService {
+public class JwtAuthenticationServiceImpl implements AuthenticationService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -28,7 +28,7 @@ public class JwtAuthenticationService implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public JwtAuthenticationService(
+    public JwtAuthenticationServiceImpl(
             UserRepository userRepository,
             RoleRepository roleRepository,
             PasswordEncoder passwordEncoder,

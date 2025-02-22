@@ -36,6 +36,9 @@ public class User implements UserDetails {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "avatar")
+    private String avatar;
+
     @OneToMany(
             mappedBy = "user",
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}
@@ -54,6 +57,7 @@ public class User implements UserDetails {
 
     }
 
+    // constructor used when registering new user
     public User(String username, String password, String email, LocalDateTime createdAt) {
         this.username = username;
         this.password = password;
@@ -61,7 +65,7 @@ public class User implements UserDetails {
         this.createdAt = createdAt;
     }
 
-    public User(Integer id, String username, String password, LocalDate dob, String email, LocalDateTime createdAt, LocalDateTime updatedAt, Set<Role> roles) {
+    public User(Integer id, String username, String password, LocalDate dob, String email, LocalDateTime createdAt, LocalDateTime updatedAt, String avatar, Set<Role> roles) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -69,6 +73,7 @@ public class User implements UserDetails {
         this.email = email;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.avatar = avatar;
         this.roles = roles;
     }
 
@@ -155,6 +160,14 @@ public class User implements UserDetails {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     @JsonManagedReference(value = "user-posts")

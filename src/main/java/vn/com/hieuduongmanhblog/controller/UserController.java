@@ -1,5 +1,8 @@
 package vn.com.hieuduongmanhblog.controller;
 
+import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 import vn.com.hieuduongmanhblog.dto.ResponseDTO;
 import vn.com.hieuduongmanhblog.dto.UserDTO;
 import vn.com.hieuduongmanhblog.service.UserService;
@@ -7,11 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/users")
 public class UserController {
     private final UserService userService;
 
@@ -20,33 +23,42 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping(value = "/users")
-    public ResponseDTO getAllUsers() {
-        List<UserDTO> users = userService.getAllUsers();
+    @GetMapping(params = {})
+    public ResponseDTO getAllUsers(
+            @RequestParam(value = "page", defaultValue = "0", required = false) int pageNumber,
+            @RequestParam(value = "size", defaultValue = "5", required = false) int pageSize
+    ) {
+        Page<UserDTO> users = this.userService.getAllUsers(pageNumber, pageSize);
         return new ResponseDTO(HttpStatus.OK, "Get All Users Successful", LocalDateTime.now(), users);
     }
 
-    @GetMapping("/users/{userId}")
+    @GetMapping("/{userId}")
     public ResponseDTO findUserById(@PathVariable int userId) {
-        UserDTO givenUser = userService.findUserById(userId);
+        UserDTO givenUser = this.userService.findUserById(userId);
         return new ResponseDTO(HttpStatus.OK, "Get User By ID Successful", LocalDateTime.now(), givenUser);
     }
 
-    @GetMapping(value = "/users", params = {"username"})
+    @GetMapping(params = {"username"})
     public ResponseDTO findUserByUsername(@RequestParam(name = "username") String username) {
-        UserDTO givenUser = userService.findUserByUsername(username);
+        UserDTO givenUser = this.userService.findUserByUsername(username);
         return new ResponseDTO(HttpStatus.OK, "Get User By username Successful", LocalDateTime.now(), givenUser);
     }
 
-    @PutMapping("/users/{userId}")
-    public ResponseDTO updateExistingUser(@PathVariable int userId, @RequestBody UserDTO newUser) {
-        UserDTO updatedUser = userService.updateUserById(userId, newUser);
+    @PatchMapping("/{userId}")
+    public ResponseDTO updateExistingUser(@PathVariable int userId, @Valid @RequestBody UserDTO newUser) {
+        UserDTO updatedUser = this.userService.updateUserById(userId, newUser);
         return new ResponseDTO(HttpStatus.OK, "Update User Successful", LocalDateTime.now(), updatedUser);
     }
 
-    @DeleteMapping("/users/{userId}")
+    @DeleteMapping("/{userId}")
     public ResponseDTO deleteUserById(@PathVariable int userId) {
-        userService.deleteUserById(userId);
+        this.userService.deleteUserById(userId);
         return new ResponseDTO(HttpStatus.OK, "Delete User Successful", LocalDateTime.now());
+    }
+
+    @PatchMapping("/{userId}/change-avatar")
+    public ResponseDTO changeAvatar(@PathVariable int userId, @RequestPart MultipartFile multipartFile) throws IOException {
+        UserDTO userWithUpdatedAvatar = this.userService.changeAvatar(userId, multipartFile);
+        return new ResponseDTO(HttpStatus.OK, "Update User Avatar Successful", LocalDateTime.now(), userWithUpdatedAvatar);
     }
 }
