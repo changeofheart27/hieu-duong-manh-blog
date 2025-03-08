@@ -1,5 +1,6 @@
 package vn.com.hieuduongmanhblog.service.impl;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.com.hieuduongmanhblog.service.ImageStorageService;
 import vn.com.hieuduongmanhblog.service.UserService;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +34,9 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     private final ImageStorageService imageService;
+
+    @Value("${project.image.url}")
+    private String avatarUrlBase;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, ImageStorageService imageStorageService) {
@@ -114,7 +119,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDTO changeAvatar(int userId, MultipartFile multipartFile) {
+    public UserDTO changeAvatar(int userId, MultipartFile multipartFile) throws IOException {
         User userToUpdate = this.userRepository
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Could not find User with id - " + userId));
@@ -123,14 +128,15 @@ public class UserServiceImpl implements UserService {
         }
         // upload image
         String avatarName = this.imageService.uploadImage(multipartFile);
-//        String avatarUrl = this.imageService.(avatarName);
+        String avatarUrl = this.avatarUrlBase + avatarName;
 
         // update user with new avatarName
         userToUpdate.setAvatar(avatarName);
+        userToUpdate.setUpdatedAt(LocalDateTime.now());
         User updatedUser = this.userRepository.save(userToUpdate);
 
         UserDTO userDTO = this.userMapper.toUserDTO(updatedUser);
-//        userDTO.setAvatarUrl(avatarUrl);
+        userDTO.setAvatarUrl(avatarUrl);
 
         return userDTO;
     }

@@ -42,13 +42,14 @@ public class UserDTO {
         this.roles = roles;
     }
 
-    public UserDTO(String username, LocalDate dob, String email, LocalDateTime createdAt, LocalDateTime updatedAt, String avatar, String roles) {
+    public UserDTO(String username, LocalDate dob, String email, LocalDateTime createdAt, LocalDateTime updatedAt, String avatar, String avatarUrl, String roles) {
         this.username = username;
         this.dob = dob;
         this.email = email;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.avatar = avatar;
+        this.avatarUrl = avatarUrl;
         this.roles = roles;
     }
 

@@ -1,5 +1,6 @@
 package vn.com.hieuduongmanhblog.dto.mapper;
 
+import org.springframework.beans.factory.annotation.Value;
 import vn.com.hieuduongmanhblog.dto.UserDTO;
 import vn.com.hieuduongmanhblog.entity.Role;
 import vn.com.hieuduongmanhblog.entity.User;
@@ -12,7 +13,11 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserMapper {
+    @Value("${project.image.url}")
+    private String avatarUrlBase;
+
     public UserDTO toUserDTO(User user) {
+        String avatarUrl = this.avatarUrlBase + user.getAvatar();
         return new UserDTO(
                 user.getUsername(),
                 user.getDob(),
@@ -20,6 +25,7 @@ public class UserMapper {
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
                 user.getAvatar(),
+                avatarUrl,
                 mapRoles(user.getRoles())
         );
     }

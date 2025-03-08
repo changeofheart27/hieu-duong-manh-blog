@@ -57,8 +57,12 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/change-avatar")
-    public ResponseDTO changeAvatar(@PathVariable int userId, @RequestPart MultipartFile multipartFile) throws IOException {
-        UserDTO userWithUpdatedAvatar = this.userService.changeAvatar(userId, multipartFile);
-        return new ResponseDTO(HttpStatus.OK, "Update User Avatar Successful", LocalDateTime.now(), userWithUpdatedAvatar);
+    public ResponseDTO changeAvatar(@PathVariable int userId, @RequestPart MultipartFile imageFile) {
+        try {
+            UserDTO userWithUpdatedAvatar = this.userService.changeAvatar(userId, imageFile);
+            return new ResponseDTO(HttpStatus.OK, "Update User Avatar Successful", LocalDateTime.now(), userWithUpdatedAvatar);
+        } catch (IOException e) {
+            return new ResponseDTO(HttpStatus.BAD_REQUEST, "Update User Avatar Failed: " + e.getMessage(), LocalDateTime.now());
+        }
     }
 }

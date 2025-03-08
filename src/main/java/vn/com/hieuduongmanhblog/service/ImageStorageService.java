@@ -1,17 +1,18 @@
 package vn.com.hieuduongmanhblog.service;
 
-import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.stream.Stream;
 
 public interface ImageStorageService {
-    String uploadImage(MultipartFile imageFile);
+    String uploadImage(MultipartFile imageFile) throws IOException;
 
-    Resource loadImage(String imageName);
+    List<String> getAllImageUrls() throws IOException;
 
-    Stream<Path> loadAllImages();
+    byte[] loadImage(String imageName) throws IOException;
 
     void deleteAllImages();
 }
