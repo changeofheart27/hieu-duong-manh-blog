@@ -66,11 +66,11 @@ public class PostControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(200)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Get All Posts Successful")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data", Matchers.hasSize(5)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].title").value("Demo Post Title 1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].description").value("Demo Post Description 1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].content").value("Demo Post Content 1"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content", Matchers.hasSize(5)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].title").value("Demo Post Title 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].description").value("Demo Post Description 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].content").value("Demo Post Content 1"));
     }
 
     @Test
@@ -121,9 +121,9 @@ public class PostControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(200)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Get Posts By Username Successful")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data", Matchers.hasSize(3)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].postAuthor").value("hieuduongm"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content", Matchers.hasSize(3)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].postAuthor").value("hieuduongm"));
     }
 
     @Test
@@ -140,7 +140,7 @@ public class PostControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(200)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Get Posts By Username Successful")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data", Matchers.hasSize(0)));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content", Matchers.hasSize(0)));
     }
 
     @Test

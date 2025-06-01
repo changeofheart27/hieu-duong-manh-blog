@@ -14,8 +14,9 @@ public class Role {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "role_name")
-    private String roleName;
+    @Column(name = "role_name", nullable = false, unique = true)
+    @Enumerated(EnumType.STRING)
+    private RoleName roleName;
 
     @ManyToMany()
     @JoinTable(
@@ -29,7 +30,7 @@ public class Role {
 
     }
 
-    public Role(String roleName) {
+    public Role(RoleName roleName) {
         this.roleName = roleName;
     }
 
@@ -41,11 +42,11 @@ public class Role {
         this.id = id;
     }
 
-    public String getRoleName() {
+    public RoleName getRoleName() {
         return roleName;
     }
 
-    public void setRoleName(String roleName) {
+    public void setRoleName(RoleName roleName) {
         this.roleName = roleName;
     }
 
@@ -61,13 +62,12 @@ public class Role {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-
         Role role = (Role) o;
-        return Objects.equals(id, role.id);
+        return Objects.equals(id, role.id) && roleName == role.roleName;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hash(id, roleName);
     }
 }

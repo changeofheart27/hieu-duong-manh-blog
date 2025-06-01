@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
         if (newUserData.getEmail() != null && !newUserData.getEmail().isEmpty()) {
             userToUpdate.setEmail(newUserData.getEmail());
         }
-        newUserData.setUpdatedAt(LocalDateTime.now());
+        userToUpdate.setUpdatedAt(LocalDateTime.now());
 
         User updatedUser = this.userRepository.save(userToUpdate);
         return this.userMapper.toUserDTO(updatedUser);
@@ -145,10 +145,10 @@ public class UserServiceImpl implements UserService {
      * check if current logged-in user is the same as user to perform update/delete operations
      * if user role is ROLE_ADMIN then bypass the check
      *
-     * @param usernameDTO
+     * @param username
      * @return Boolean
      */
-    private Boolean checkCurrentLoggedInUser(String usernameDTO) {
+    private Boolean checkCurrentLoggedInUser(String username) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDetails currentUserInfo = (UserDetails) auth.getPrincipal();
 
@@ -157,7 +157,7 @@ public class UserServiceImpl implements UserService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
         if (!currentUserRole.contains("ADMIN")) {
-            return currentUserInfo.getUsername().equals(usernameDTO);
+            return currentUserInfo.getUsername().equals(username);
         }
 
         return true;

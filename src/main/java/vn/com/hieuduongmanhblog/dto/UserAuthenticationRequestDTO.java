@@ -6,7 +6,7 @@ public class UserAuthenticationRequestDTO {
     @NotNull(message = "username cannot be null")
     private String username;
 
-    @NotNull(message = "username cannot be null")
+    @NotNull(message = "password cannot be null")
     private String password;
 
     public UserAuthenticationRequestDTO() {

@@ -44,7 +44,7 @@ public class UserController {
         return new ResponseDTO(HttpStatus.OK, "Get User By username Successful", LocalDateTime.now(), givenUser);
     }
 
-    @PatchMapping("/{userId}")
+    @PutMapping("/{userId}")
     public ResponseDTO updateExistingUser(@PathVariable int userId, @Valid @RequestBody UserDTO newUser) {
         UserDTO updatedUser = this.userService.updateUserById(userId, newUser);
         return new ResponseDTO(HttpStatus.OK, "Update User Successful", LocalDateTime.now(), updatedUser);

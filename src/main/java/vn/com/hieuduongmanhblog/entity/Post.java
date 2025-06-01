@@ -14,7 +14,7 @@ public class Post {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "title")
+    @Column(name = "title", nullable = false)
     private String title;
 
     @Column(name = "description")
@@ -132,14 +132,12 @@ public class Post {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-
         Post post = (Post) o;
-        return Objects.equals(id, post.id);
+        return Objects.equals(id, post.id) && Objects.equals(title, post.title);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hash(id, title);
     }
-
 }

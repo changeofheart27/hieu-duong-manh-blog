@@ -52,9 +52,9 @@ CREATE TABLE `roles` (
 --
 INSERT INTO `roles` (`id`, `role_name`)
 VALUES
-(`id`,'ROLE_USER'),
-(`id`,'ROLE_AUTHOR'),
-(`id`,'ROLE_ADMIN');
+(`id`,'USER'),
+(`id`,'AUTHOR'),
+(`id`,'ADMIN');
 
 --
 -- Table structure for table `users-roles`

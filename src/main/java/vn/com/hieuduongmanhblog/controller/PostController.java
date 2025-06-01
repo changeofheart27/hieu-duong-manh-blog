@@ -1,5 +1,6 @@
 package vn.com.hieuduongmanhblog.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import vn.com.hieuduongmanhblog.dto.PostDTO;
 import vn.com.hieuduongmanhblog.dto.ResponseDTO;
@@ -46,13 +47,13 @@ public class PostController {
     }
 
     @PostMapping("/posts")
-    public ResponseDTO createNewPost(@RequestBody PostDTO newPost) {
+    public ResponseDTO createNewPost(@Valid @RequestBody PostDTO newPost) {
         PostDTO createdPost = postService.createPost(newPost);
         return new ResponseDTO(HttpStatus.CREATED, "Create New Post Successful", LocalDateTime.now(), createdPost);
     }
 
     @PutMapping("/posts/{postId}")
-    public ResponseDTO updateExistingPost(@PathVariable int postId, @RequestBody PostDTO newPost) {
+    public ResponseDTO updateExistingPost(@PathVariable int postId, @Valid @RequestBody PostDTO newPost) {
         PostDTO updatedPost = postService.updatePostById(postId, newPost);
         return new ResponseDTO(HttpStatus.OK, "Update Post Successful", LocalDateTime.now(), updatedPost);
     }

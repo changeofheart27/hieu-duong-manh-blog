@@ -9,7 +9,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class UserDTO {
-    @NotNull(message = "username cannot be null")
+    private Integer id;
+
     private String username;
 
     @NotNull(message = "dob cannot be null")
@@ -17,6 +18,7 @@ public class UserDTO {
     @JsonFormat(pattern = "MM/dd/yyyy")
     private LocalDate dob;
 
+    @NotNull(message = "email cannot be null")
     @Pattern(regexp = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$", message = "email is not valid")
     private String email;
 
@@ -28,21 +30,22 @@ public class UserDTO {
 
     private String avatarUrl;
 
-    @NotNull(message = "roles cannot be null")
     private String roles;
 
     public UserDTO() {
 
     }
 
-    public UserDTO(String username, LocalDate dob, String email, String roles) {
+    public UserDTO(Integer id, String username, LocalDate dob, String email, String roles) {
+        this.id = id;
         this.username = username;
         this.dob = dob;
         this.email = email;
         this.roles = roles;
     }
 
-    public UserDTO(String username, LocalDate dob, String email, LocalDateTime createdAt, LocalDateTime updatedAt, String avatar, String avatarUrl, String roles) {
+    public UserDTO(Integer id, String username, LocalDate dob, String email, LocalDateTime createdAt, LocalDateTime updatedAt, String avatar, String avatarUrl, String roles) {
+        this.id = id;
         this.username = username;
         this.dob = dob;
         this.email = email;
@@ -51,6 +54,14 @@ public class UserDTO {
         this.avatar = avatar;
         this.avatarUrl = avatarUrl;
         this.roles = roles;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getUsername() {

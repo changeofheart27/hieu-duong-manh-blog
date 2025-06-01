@@ -3,7 +3,7 @@ package vn.com.hieuduongmanhblog.service.impl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.GrantedAuthority;
 import vn.com.hieuduongmanhblog.dto.PostDTO;
 import vn.com.hieuduongmanhblog.dto.mapper.PostMapper;
 import vn.com.hieuduongmanhblog.entity.Post;
@@ -18,9 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.com.hieuduongmanhblog.service.PostService;
-import vn.com.hieuduongmanhblog.service.UserService;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -68,12 +66,11 @@ public class PostServiceImpl implements PostService {
         List<PostDTO> foundPostDTOList = postsPage
                 .getContent()
                 .stream()
-                .map(post -> postMapper.toPostDTO(post))
+                .map(postMapper::toPostDTO)
                 .toList();
 
         return new PageImpl<>(foundPostDTOList, postsPage.getPageable(), postsPage.getTotalElements());
     }
-
 
     @Override
     @Transactional
@@ -82,7 +79,8 @@ public class PostServiceImpl implements PostService {
         // and a save of new item instead of updating current one
         newPost.setId(0);
         Post postToCreate = postMapper.toPost(newPost);
-        UserDetails currentUserInfo = getCurrentLoggedInUser();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails currentUserInfo = (UserDetails) auth.getPrincipal();
         User user = userRepository
                 .findByUsername(currentUserInfo.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException("Could not find User with username - " + currentUserInfo.getUsername()));
@@ -102,20 +100,25 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Could not find Post with id - " + postId)
                 );
-        UserDetails currentUserInfo = getCurrentLoggedInUser();
-        String currentUserRole = currentUserInfo.getAuthorities()
-                .stream()
-                .map(role -> role.getAuthority())
-                .collect(Collectors.joining(","));
-        if (!currentUserRole.contains("ADMIN")) {
-            String postAuthor = postToUpdate.getUser().getUsername();
-            // check if post to update has the same username as current user
-            if (!currentUserInfo.getUsername().equals(postAuthor)) {
-                throw new RuntimeException("Unable to update Post by user - " + postAuthor);
-            }
+        if (!checkCurrentLoggedInUser(postToUpdate.getUser().getUsername())) {
+            throw new RuntimeException("Unable to update Post by user - " + postToUpdate.getUser().getUsername());
         }
 
-        Post updatedPost = postRepository.save(postMapper.updatePostFromPostDTO(newPost, postToUpdate));
+        if (newPost.getTitle() != null && !newPost.getTitle().isEmpty()) {
+            postToUpdate.setTitle(newPost.getTitle());
+        }
+        if (newPost.getDescription() != null && !newPost.getDescription().isEmpty()) {
+            postToUpdate.setDescription(newPost.getDescription());
+        }
+        if (newPost.getContent() != null && !newPost.getContent().isEmpty()) {
+            postToUpdate.setContent(newPost.getContent());
+        }
+        if (newPost.getTags() != null && !newPost.getTags().isEmpty()) {
+            postToUpdate.setTags(postMapper.mapTags(newPost.getTags()));
+        }
+        postToUpdate.setUpdatedAt(LocalDateTime.now());
+
+        Post updatedPost = postRepository.save(postToUpdate);
         return postMapper.toPostDTO(updatedPost);
     }
 
@@ -125,23 +128,31 @@ public class PostServiceImpl implements PostService {
         Post postToDelete = postRepository
                 .findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Could not find Post with id - " + postId));
-        UserDetails currentUserInfo = getCurrentLoggedInUser();
-        String currentUserRole = currentUserInfo.getAuthorities()
-                .stream()
-                .map(role -> role.getAuthority())
-                .collect(Collectors.joining(","));
-        if (!currentUserRole.contains("ADMIN")) {
-            String postAuthor = postToDelete.getUser().getUsername();
-            // check if post to delete has the same username as current user
-            if (!currentUserInfo.getUsername().equals(postAuthor)) {
-                throw new RuntimeException("Unable to delete Post by user - " + postAuthor);
-            }
+        if (!checkCurrentLoggedInUser(postToDelete.getUser().getUsername())) {
+            throw new RuntimeException("Unable to delete Post by user - " + postToDelete.getUser().getUsername());
         }
         postRepository.delete(postToDelete);
     }
 
-    protected UserDetails getCurrentLoggedInUser() {
+    /**
+     * check if current logged-in user is the same as user to perform update/delete operations
+     * if user role is ROLE_ADMIN then bypass the check
+     *
+     * @param username
+     * @return Boolean
+     */
+    private Boolean checkCurrentLoggedInUser(String username) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return (UserDetails) auth.getPrincipal();
+        UserDetails currentUserInfo = (UserDetails) auth.getPrincipal();
+
+        String currentUserRole = currentUserInfo.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+        if (!currentUserRole.contains("ADMIN")) {
+            return currentUserInfo.getUsername().equals(username);
+        }
+
+        return true;
     }
 }
