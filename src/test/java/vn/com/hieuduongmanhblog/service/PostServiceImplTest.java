@@ -1,9 +1,14 @@
 package vn.com.hieuduongmanhblog.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import vn.com.hieuduongmanhblog.dto.PostDTO;
 import vn.com.hieuduongmanhblog.dto.mapper.PostMapper;
-import vn.com.hieuduongmanhblog.dto.UserDTO;
 import vn.com.hieuduongmanhblog.entity.Post;
+import vn.com.hieuduongmanhblog.entity.Role;
+import vn.com.hieuduongmanhblog.entity.RoleName;
 import vn.com.hieuduongmanhblog.entity.User;
 import vn.com.hieuduongmanhblog.exception.ResourceNotFoundException;
 import vn.com.hieuduongmanhblog.repository.PostRepository;
@@ -26,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @ExtendWith(MockitoExtension.class)
 public class PostServiceImplTest {
@@ -47,24 +53,23 @@ public class PostServiceImplTest {
 
     private Post postToUpdate;
 
-    private Post postToDelete;
-
-    private User user;
+    private User user1;
 
     @BeforeEach
     void setUp() {
         // prepare data to test
-        user = new User(1, "username", "password", LocalDate.of(1999, 7, 2), "username@email.com", LocalDateTime.now(), null, null);
-        Post post1 = new Post(1, "Title 1", "Description 1", "Content 1", LocalDateTime.now(), LocalDateTime.now(), user);
-        Post post2 = new Post(2, "Title 2", "Description 2", "Content 2", LocalDateTime.now(), LocalDateTime.now(), user);
-        Post post3 = new Post(3, "Title 3", "Description 3", "Content 3", LocalDateTime.now(), LocalDateTime.now(), null);
+        user1 = new User(1, "username", "password", LocalDate.of(1999, 7, 2), "username@email.com", LocalDateTime.now(), null, "avatar1.png", Set.of(new Role(1, RoleName.USER)));
+        User user2 = new User(2, "username2", "password2", LocalDate.of(2000, 11, 22), "username2@email.com", LocalDateTime.now(), null, "avatar2.png", Set.of(new Role(2, RoleName.USER)));
+        Post post1 = new Post(1, "Title 1", "Description 1", "Content 1", LocalDateTime.now(), LocalDateTime.now(), user1);
+        Post post2 = new Post(2, "Title 2", "Description 2", "Content 2", LocalDateTime.now(), LocalDateTime.now(), user1);
+        Post post3 = new Post(3, "Title 3", "Description 3", "Content 3", LocalDateTime.now(), LocalDateTime.now(), user2);
         posts = new ArrayList<>();
         posts.add(post1);
         posts.add(post2);
         posts.add(post3);
 
-        postToCreate = new Post(1, "New Post Title 1", "New Post Description 1", "New Post Content 1", LocalDateTime.now(), LocalDateTime.now(), user);
-        postToUpdate = new Post(1, "Updated Post Title 1", "Updated Post Description 1", "Updated Post Content 1", LocalDateTime.now(), LocalDateTime.now(), user);
+        postToCreate = new Post(1, "New Post Title 1", "New Post Description 1", "New Post Content 1", LocalDateTime.now(), LocalDateTime.now(), user1);
+        postToUpdate = new Post(1, "Updated Post Title 1", "Updated Post Description 1", "Updated Post Content 1", LocalDateTime.now(), LocalDateTime.now(), user1);
     }
 
     @AfterEach
@@ -75,15 +80,31 @@ public class PostServiceImplTest {
     @Test
     @DisplayName("Get All Posts Should Return List Of Posts")
     void testGetAllPosts() {
-        PostDTO mockPostDTO = Mockito.mock(PostDTO.class);
-        Mockito.when(postRepository.findAll()).thenReturn(this.posts);
-        Mockito.when(postMapper.toPostDTO(ArgumentMatchers.any(Post.class))).thenReturn(mockPostDTO);
+        int pageNumber = 0;
+        int pageSize = 5;
+        Page<Post> postsPage = new PageImpl<>(this.posts, PageRequest.of(pageNumber, pageSize), this.posts.size());
 
-        List<PostDTO> actualPostDTOs = postServiceImpl.getAllPosts();
+        // mock the repository behavior
+        Mockito.when(postRepository.findAll(ArgumentMatchers.any(Pageable.class))).thenReturn(postsPage);
+        // mock the mapper behavior
+        Mockito.when(postMapper.toPostDTO(ArgumentMatchers.any(Post.class))).thenAnswer(invocation -> {
+            Post post = invocation.getArgument(0);
+            return new PostDTO(
+                    post.getId(),
+                    post.getTitle(),
+                    post.getDescription(),
+                    post.getContent(),
+                    post.getUser().getUsername()
+            );
+        });
 
-        Assertions.assertEquals(actualPostDTOs.size(), this.posts.size(), "Size should be 3");
+        // call the service method
+        Page<PostDTO> actualPostDTOs = postServiceImpl.getAllPosts(pageNumber, pageSize);
 
-        Mockito.verify(this.postRepository, Mockito.times(1)).findAll();
+        Assertions.assertNotNull(actualPostDTOs);
+        Assertions.assertEquals(this.posts.size(), actualPostDTOs.getContent().size(), "Size should be 3");
+
+        Mockito.verify(this.postRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(Pageable.class));
         Mockito.verify(this.postMapper, Mockito.times(3)).toPostDTO(ArgumentMatchers.any(Post.class));
     }
 
@@ -96,10 +117,10 @@ public class PostServiceImplTest {
 
         PostDTO actualPostDTO = postServiceImpl.findPostById(1);
 
-        Assertions.assertEquals(actualPostDTO.getId(), this.posts.get(0).getId(), "Id should match each other");
-        Assertions.assertEquals(actualPostDTO.getTitle(), this.posts.get(0).getTitle(), "Title should match each other");
-        Assertions.assertEquals(actualPostDTO.getDescription(), this.posts.get(0).getDescription(), "Description should match each other");
-        Assertions.assertEquals(actualPostDTO.getContent(), this.posts.get(0).getContent(), "Content should match each other");
+        Assertions.assertEquals(this.posts.get(0).getId(), actualPostDTO.getId(), "Id should match each other");
+        Assertions.assertEquals(this.posts.get(0).getTitle(), actualPostDTO.getTitle(), "Title should match each other");
+        Assertions.assertEquals(this.posts.get(0).getDescription(), actualPostDTO.getDescription(), "Description should match each other");
+        Assertions.assertEquals(this.posts.get(0).getContent(), actualPostDTO.getContent(), "Content should match each other");
 
         Mockito.verify(this.postRepository, Mockito.times(1)).findById(1);
         Mockito.verify(this.postMapper, Mockito.times(1)).toPostDTO(ArgumentMatchers.any(Post.class));
@@ -112,7 +133,7 @@ public class PostServiceImplTest {
 
         Assertions.assertThrows(
                 ResourceNotFoundException.class,
-                () -> { postServiceImpl.findPostById(10); },
+                () -> postServiceImpl.findPostById(10),
                 "Should throw exception"
         );
 
@@ -123,32 +144,58 @@ public class PostServiceImplTest {
     @Test
     @DisplayName("Find Post By User username Should Return List Of Valid Posts")
     void testFindPostByUserSuccess() {
-        // remove post without user
-        this.posts.remove(2);
-        UserDTO userDTO = new UserDTO(1, "username", LocalDate.of(1999, 7, 2), "username@email.com", null);
-        PostDTO postDTO = new PostDTO(1, "Title 1", "Description 1", "Content 1", userDTO.getUsername());
-        Mockito.when(postRepository.findByUser_Username(ArgumentMatchers.anyString())).thenReturn(this.posts);
-        Mockito.when(postMapper.toPostDTO(ArgumentMatchers.any(Post.class))).thenReturn(postDTO);
+        int pageNumber = 0;
+        int pageSize = 5;
+        // remove post with incorrect user
+        this.posts.remove(1);
+        Page<Post> postsPage = new PageImpl<>(this.posts, PageRequest.of(pageNumber, pageSize), this.posts.size());
 
-        List<PostDTO> actualPostDTOs = postServiceImpl.findPostsByUser("username");
+        // mock the repository behavior
+        Mockito.when(postRepository
+                .findByUser_Username(ArgumentMatchers.eq("username"), ArgumentMatchers.any(PageRequest.class)))
+                .thenReturn(postsPage);
+        // mock the mapper behavior
+        Mockito.when(postMapper.toPostDTO(ArgumentMatchers.any(Post.class))).thenAnswer(invocation -> {
+            Post post = invocation.getArgument(0);
+            return new PostDTO(
+                    post.getId(),
+                    post.getTitle(),
+                    post.getDescription(),
+                    post.getContent(),
+                    post.getUser().getUsername()
+            );
+        });
 
-        Assertions.assertEquals(actualPostDTOs.size(), this.posts.size(), "Size should be 2");
-        Assertions.assertEquals(actualPostDTOs.get(0).getPostAuthor(), userDTO.getUsername(), "Username should match each other");
+        // call the service method
+        Page<PostDTO> actualPostDTOs = postServiceImpl.findPostsByUser("username", pageNumber, pageSize);
 
-        Mockito.verify(this.postRepository, Mockito.times(1)).findByUser_Username(ArgumentMatchers.anyString());
+        Assertions.assertNotNull(actualPostDTOs);
+        Assertions.assertEquals(this.posts.size(), actualPostDTOs.getContent().size(), "Size should be 2");
+        Assertions.assertEquals("username", actualPostDTOs.getContent().get(0).getPostAuthor(), "Username should match each other");
+
+        Mockito.verify(this.postRepository, Mockito.times(1)).findByUser_Username(ArgumentMatchers.eq("username"), ArgumentMatchers.any(PageRequest.class));
         Mockito.verify(this.postMapper, Mockito.times(2)).toPostDTO(ArgumentMatchers.any(Post.class));
     }
 
     @Test
     @DisplayName("Find Post By User username Not Found Should Return List Of Empty Post")
     void testFindPostByUserFailed() {
-        Mockito.when(postRepository.findByUser_Username(ArgumentMatchers.anyString())).thenReturn(new ArrayList<>());
+        int pageNumber = 0;
+        int pageSize = 5;
+        Page<Post> postsPage = new PageImpl<>(new ArrayList<>(), PageRequest.of(pageNumber, pageSize), 0);
 
-        List<PostDTO> actualPostDTOs = postServiceImpl.findPostsByUser("username1");
+        // mock the repository behavior
+        Mockito.when(postRepository
+                        .findByUser_Username(ArgumentMatchers.anyString(), ArgumentMatchers.any(PageRequest.class)))
+                .thenReturn(postsPage);
 
-        Assertions.assertEquals(actualPostDTOs.size(), 0, "Size should be 0");
+        // call the service method
+        Page<PostDTO> actualPostDTOs = postServiceImpl.findPostsByUser("username1", pageNumber, pageSize);
 
-        Mockito.verify(this.postRepository, Mockito.times(1)).findByUser_Username(ArgumentMatchers.anyString());
+        Assertions.assertNotNull(actualPostDTOs);
+        Assertions.assertEquals(0, actualPostDTOs.getContent().size(), "Size should be 0");
+
+        Mockito.verify(this.postRepository, Mockito.times(1)).findByUser_Username(ArgumentMatchers.anyString(), ArgumentMatchers.any(PageRequest.class));
         Mockito.verify(this.postMapper, Mockito.times(0)).toPostDTO(ArgumentMatchers.any(Post.class));
     }
 
@@ -170,7 +217,7 @@ public class PostServiceImplTest {
         SecurityContextHolder.setContext(securityContext);
         Mockito.when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(userDetails);
         Mockito.when(userDetails.getUsername()).thenReturn("username");
-        Mockito.when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
+        Mockito.when(userRepository.findByUsername("username")).thenReturn(Optional.of(user1));
         Mockito.when(postRepository.save(ArgumentMatchers.any(Post.class))).thenReturn(postToCreate);
         Mockito.when(postMapper.toPostDTO(postToCreate)).thenReturn(postDTO);
 
@@ -204,7 +251,6 @@ public class PostServiceImplTest {
         SecurityContextHolder.setContext(securityContext);
         Mockito.when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(userDetails);
         Mockito.when(userDetails.getUsername()).thenReturn("username");
-        Mockito.when(postMapper.updatePostFromPostDTO(postDTO, postToUpdate)).thenReturn(postToUpdate);
         Mockito.when(postRepository.save(ArgumentMatchers.any(Post.class))).thenReturn(postToUpdate);
         Mockito.when(postMapper.toPostDTO(postToUpdate)).thenReturn(postDTO);
 
@@ -216,7 +262,6 @@ public class PostServiceImplTest {
         Assertions.assertEquals(actualPostDTO.getContent(), postDTO.getContent(), "Content should match each other");
 
         Mockito.verify(this.postRepository, Mockito.times(1)).save(postToUpdate);
-        Mockito.verify(this.postMapper, Mockito.times(1)).updatePostFromPostDTO(postDTO, postToUpdate);
         Mockito.verify(this.postMapper, Mockito.times(1)).toPostDTO(postToUpdate);
     }
 

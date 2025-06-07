@@ -1,12 +1,18 @@
 package vn.com.hieuduongmanhblog.dto;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+
 import java.time.LocalDateTime;
 
 public class UserRegistrationRequestDTO {
+    @NotNull(message = "username cannot be null")
     private String username;
 
+    @NotNull(message = "password cannot be null")
     private String password;
 
+    @Pattern(regexp = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$", message = "email is not valid")
     private String email;
 
     private LocalDateTime createdAt;

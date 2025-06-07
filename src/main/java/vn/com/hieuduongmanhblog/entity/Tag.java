@@ -28,6 +28,10 @@ public class Tag {
 
     }
 
+    public Tag(String tagName) {
+        this.tagName = tagName;
+    }
+
     public Tag(int id, String tagName, List<Post> posts) {
         this.id = id;
         this.tagName = tagName;

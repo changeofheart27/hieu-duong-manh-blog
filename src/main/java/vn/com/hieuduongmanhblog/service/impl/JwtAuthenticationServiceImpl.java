@@ -4,7 +4,9 @@ import org.springframework.security.core.Authentication;
 import vn.com.hieuduongmanhblog.dto.UserAuthenticationRequestDTO;
 import vn.com.hieuduongmanhblog.dto.UserRegistrationRequestDTO;
 import vn.com.hieuduongmanhblog.entity.Role;
+import vn.com.hieuduongmanhblog.entity.RoleName;
 import vn.com.hieuduongmanhblog.entity.User;
+import vn.com.hieuduongmanhblog.exception.ResourceNotFoundException;
 import vn.com.hieuduongmanhblog.repository.RoleRepository;
 import vn.com.hieuduongmanhblog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +19,11 @@ import vn.com.hieuduongmanhblog.service.AuthenticationService;
 import vn.com.hieuduongmanhblog.service.JwtUtilService;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class JwtAuthenticationService implements AuthenticationService {
+public class JwtAuthenticationServiceImpl implements AuthenticationService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -28,7 +31,7 @@ public class JwtAuthenticationService implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public JwtAuthenticationService(
+    public JwtAuthenticationServiceImpl(
             UserRepository userRepository,
             RoleRepository roleRepository,
             PasswordEncoder passwordEncoder,
@@ -43,13 +46,18 @@ public class JwtAuthenticationService implements AuthenticationService {
     }
 
     public String registerUser(UserRegistrationRequestDTO request) {
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("User with username " + request.getUsername() + " already exists!");
+        }
+
         User newUser = new User(
                 request.getUsername(),
                 passwordEncoder.encode(request.getPassword()),
                 request.getEmail(),
                 LocalDateTime.now()
         );
-        Role defaultUserRole = roleRepository.findByRoleName("ROLE_USER");
+        Role defaultUserRole = roleRepository.findByRoleName(RoleName.USER)
+                .orElseThrow(() -> new ResourceNotFoundException("Could not find Role with roleName - " + RoleName.USER.name()));
         newUser.setRoles(Set.of(defaultUserRole));
         userRepository.save(newUser);
 

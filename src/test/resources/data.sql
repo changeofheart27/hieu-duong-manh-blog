@@ -22,9 +22,9 @@ INSERT INTO users (username, password, dob, email, created_at) VALUES ('thanhpha
 --
 -- Inserting data for table `roles`
 --
-INSERT INTO roles (id, role_name) VALUES (1,'ROLE_USER');
-INSERT INTO roles (id, role_name) VALUES (2,'ROLE_AUTHOR');
-INSERT INTO roles (id, role_name) VALUES (3,'ROLE_ADMIN');
+INSERT INTO roles (id, role_name) VALUES (1,'USER');
+INSERT INTO roles (id, role_name) VALUES (2,'AUTHOR');
+INSERT INTO roles (id, role_name) VALUES (3,'ADMIN');
 
 --
 -- Inserting data for table `users-roles`

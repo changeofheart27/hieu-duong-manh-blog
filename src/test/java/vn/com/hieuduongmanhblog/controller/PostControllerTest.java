@@ -1,8 +1,11 @@
 package vn.com.hieuduongmanhblog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import vn.com.hieuduongmanhblog.dto.PostDTO;
 import vn.com.hieuduongmanhblog.entity.Role;
+import vn.com.hieuduongmanhblog.entity.RoleName;
 import vn.com.hieuduongmanhblog.entity.User;
 import vn.com.hieuduongmanhblog.exception.ResourceNotFoundException;
 import vn.com.hieuduongmanhblog.service.JwtUtilService;
@@ -50,7 +53,7 @@ public class PostControllerTest {
     void setUp() {
         // prepare data to test
         objectMapper = new ObjectMapper();
-        User user = new User(1, "username", "password", LocalDate.of(1999, 7, 2), "username@email.com", LocalDateTime.now(), null, Set.of(new Role("ROLE_USER")));
+        User user = new User(1, "username", "password", LocalDate.of(1999, 7, 2), "username@email.com", LocalDateTime.now(), null, "avatar1.png", Set.of(new Role(1, RoleName.USER)));
         PostDTO post1 = new PostDTO(1, "Title 1", "Description 1", "Content 1", user.getUsername());
         PostDTO post2 = new PostDTO(2, "Title 2", "Description 2", "Content 2", user.getUsername());
         PostDTO post3 = new PostDTO(3, "Title 3", "Description 3", "Content 3", null);
@@ -68,19 +71,27 @@ public class PostControllerTest {
     @Test
     @DisplayName("GET OPERATION: Get All Posts")
     void testGetAllPosts() throws Exception {
-        Mockito.when(postService.getAllPosts()).thenReturn(this.postDTOs);
+        int pageNumber = 0;
+        int pageSize = 5;
+        Page<PostDTO> postDTOsPage = new PageImpl<>(this.postDTOs);
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts"))
+        Mockito.when(
+                postService.getAllPosts(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt())
+        ).thenReturn(postDTOsPage);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts")
+                        .param("page", String.valueOf(pageNumber))
+                        .param("size", String.valueOf(pageSize)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Get All Posts Successful"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data", Matchers.hasSize(3)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].title").value("Title 1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].description").value("Description 1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].content").value("Content 1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].postAuthor").value("username"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content", Matchers.hasSize(3)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].title").value("Title 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].description").value("Description 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].content").value("Content 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].postAuthor").value("username"));
     }
 
     @Test
@@ -116,32 +127,53 @@ public class PostControllerTest {
     @DisplayName("GET OPERATION: Find Posts By User username Should Return List Of Valid Posts")
     void testFindPostByUserSuccess() throws Exception {
         this.postDTOs.remove(2);
-        Mockito.when(postService.findPostsByUser("username")).thenReturn(this.postDTOs);
+        int pageNumber = 0;
+        int pageSize = 5;
+        Page<PostDTO> postDTOsPage = new PageImpl<>(this.postDTOs);
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts?username={username}", "username"))
+        Mockito.when(
+                postService.findPostsByUser(
+                        ArgumentMatchers.anyString(),
+                        ArgumentMatchers.anyInt(),
+                        ArgumentMatchers.anyInt()
+                )).thenReturn(postDTOsPage);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts?username={username}", "username")
+                        .param("page", String.valueOf(pageNumber))
+                        .param("size", String.valueOf(pageSize)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Get Posts By Username Successful"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data", Matchers.hasSize(2)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].id").value(2))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].title").value("Title 2"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].description").value("Description 2"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].content").value("Content 2"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].postAuthor").value("username"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content", Matchers.hasSize(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[1].id").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[1].title").value("Title 2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[1].description").value("Description 2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[1].content").value("Content 2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[1].postAuthor").value("username"));
     }
 
     @Test
     @DisplayName("GET OPERATION: Find Posts By User username Should Return List Of Empty Post")
     void testFindPostByUserFailed() throws Exception {
-        Mockito.when(postService.findPostsByUser(ArgumentMatchers.anyString())).thenReturn(new ArrayList<>());
+        int pageNumber = 0;
+        int pageSize = 5;
+        Page<PostDTO> postDTOsPage = new PageImpl<>(new ArrayList<>());
+        Mockito.when(
+                postService.findPostsByUser(
+                        ArgumentMatchers.anyString(),
+                        ArgumentMatchers.anyInt(),
+                        ArgumentMatchers.anyInt()
+                )).thenReturn(postDTOsPage);
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts?username={username}", "username123"))
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts?username={username}", "username123")
+                        .param("page", String.valueOf(pageNumber))
+                        .param("size", String.valueOf(pageSize)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Get Posts By Username Successful"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data", Matchers.hasSize(0)));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content", Matchers.hasSize(0)));
     }
 
     @Test
@@ -153,6 +185,7 @@ public class PostControllerTest {
         createdPostDTO.setDescription("New Post Description 1");
         createdPostDTO.setContent("New Post Content 1");
         createdPostDTO.setPostAuthor("username");
+        createdPostDTO.setTags("#java");
 
         // The mock call MUST use any instead of a concrete object
         Mockito.when(postService.createPost(ArgumentMatchers.any(PostDTO.class))).thenReturn(createdPostDTO);
@@ -186,6 +219,7 @@ public class PostControllerTest {
         updatedPostDTO.setDescription("Updated Post Description 1");
         updatedPostDTO.setContent("Updated Post Content 1");
         updatedPostDTO.setPostAuthor("username");
+        updatedPostDTO.setTags("#java");
 
         // The mock call MUST use any instead of a concrete object
         Mockito.when(postService.updatePostById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(PostDTO.class))).thenReturn(updatedPostDTO);
@@ -218,6 +252,7 @@ public class PostControllerTest {
         updatedPostDTO.setDescription("Updated Post Description 1");
         updatedPostDTO.setContent("Updated Post Content 1");
         updatedPostDTO.setPostAuthor("username");
+        updatedPostDTO.setTags("#java");
 
         // The mock call MUST use any instead of a concrete object
         Mockito.when(postService.updatePostById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(PostDTO.class)))

@@ -1,9 +1,14 @@
 package vn.com.hieuduongmanhblog.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import vn.com.hieuduongmanhblog.dto.UserDTO;
 import vn.com.hieuduongmanhblog.dto.mapper.UserMapper;
 import vn.com.hieuduongmanhblog.entity.Post;
 import vn.com.hieuduongmanhblog.entity.Role;
+import vn.com.hieuduongmanhblog.entity.RoleName;
 import vn.com.hieuduongmanhblog.entity.User;
 import vn.com.hieuduongmanhblog.exception.ResourceNotFoundException;
 import vn.com.hieuduongmanhblog.repository.UserRepository;
@@ -42,17 +47,14 @@ public class UserServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        Role userRole = new Role();
-        userRole.setRoleName("ROLE_USER");
-        Role authorRole = new Role();
-        userRole.setRoleName("ROLE_AUTHOR");
-        Role adminRole = new Role();
-        userRole.setRoleName("ROLE_ADMIN");
+        Role userRole = new Role(1, RoleName.USER);
+        Role authorRole = new Role(2, RoleName.AUTHOR);
+        Role adminRole = new Role(3, RoleName.ADMIN);
         // prepare data to test
-        User user1 = new User(1, "username1", "password1", null, "username1@email.com", LocalDateTime.now(), LocalDateTime.now(), Set.of(userRole, authorRole, adminRole));
-        User user2 = new User(2, "username2", "password2", null, "username2@email.com", LocalDateTime.now(), LocalDateTime.now(), Set.of(userRole, authorRole));
-        User user3 = new User(3, "username3", "password3", null, "username3@email.com", LocalDateTime.now(), LocalDateTime.now(), Set.of(userRole, authorRole));
-        User user4 = new User(4, "username4", "password4", null, "username4@email.com", LocalDateTime.now(), LocalDateTime.now(), Set.of(userRole));
+        User user1 = new User(1, "username1", "password1", null, "username1@email.com", LocalDateTime.now(), LocalDateTime.now(), "avatar1.png", Set.of(userRole, authorRole, adminRole));
+        User user2 = new User(2, "username2", "password2", null, "username2@email.com", LocalDateTime.now(), LocalDateTime.now(), "avatar2.png", Set.of(userRole, authorRole));
+        User user3 = new User(3, "username3", "password3", null, "username3@email.com", LocalDateTime.now(), LocalDateTime.now(), "avatar3.png", Set.of(userRole, authorRole));
+        User user4 = new User(4, "username4", "password4", null, "username4@email.com", LocalDateTime.now(), LocalDateTime.now(), "avatar4.png", Set.of(userRole));
 
         users = new ArrayList<>();
         users.add(user1);
@@ -69,15 +71,31 @@ public class UserServiceImplTest {
     @Test
     @DisplayName("Get All Users Should Return List Of Users")
     void testGetAllUsers() {
-        UserDTO mockUserDTO = Mockito.mock(UserDTO.class);
-        Mockito.when(userRepository.findAll()).thenReturn(this.users);
-        Mockito.when(userMapper.toUserDTO(ArgumentMatchers.any(User.class))).thenReturn(mockUserDTO);
+        int pageNumber = 0;
+        int pageSize = 5;
+        Page<User> usersPage = new PageImpl<>(this.users, PageRequest.of(pageNumber, pageSize), this.users.size());
 
-        List<UserDTO> actualUserDTOs = userServiceImpl.getAllUsers();
+        // mock the repository behavior
+        Mockito.when(userRepository.findAll(ArgumentMatchers.any(Pageable.class))).thenReturn(usersPage);
+        // mock the mapper behavior
+        Mockito.when(userMapper.toUserDTO(ArgumentMatchers.any(User.class))).thenAnswer(invocation -> {
+           User user = invocation.getArgument(0);
+           return new UserDTO(
+                   user.getId(),
+                   user.getUsername(),
+                   user.getDob(),
+                   user.getEmail(),
+                   this.userMapper.mapRoles(user.getRoles())
+           );
+        });
 
-        Assertions.assertEquals(actualUserDTOs.size(), this.users.size(), "Size should be 4");
+        // call the service method
+        Page<UserDTO> actualUserDTOs = userServiceImpl.getAllUsers(pageNumber, pageSize);
 
-        Mockito.verify(this.userRepository, Mockito.times(1)).findAll();
+        Assertions.assertNotNull(actualUserDTOs);
+        Assertions.assertEquals(actualUserDTOs.getContent().size(), this.users.size(), "Size should be 4");
+
+        Mockito.verify(this.userRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(PageRequest.class));
         Mockito.verify(this.userMapper, Mockito.times(4)).toUserDTO(ArgumentMatchers.any(User.class));
     }
 
@@ -90,10 +108,10 @@ public class UserServiceImplTest {
 
         UserDTO actualUserDTO = userServiceImpl.findUserById(1);
 
-        Assertions.assertEquals(actualUserDTO.getId(), this.users.get(0).getId(), "Id should match each other");
-        Assertions.assertEquals(actualUserDTO.getUsername(), this.users.get(0).getUsername(), "Username should match each other");
-        Assertions.assertEquals(actualUserDTO.getDob(), this.users.get(0).getDob(), "Dob should match each other");
-        Assertions.assertEquals(actualUserDTO.getEmail(), this.users.get(0).getEmail(), "Email should match each other");
+        Assertions.assertEquals(1, actualUserDTO.getId(), "Id should match each other");
+        Assertions.assertEquals(this.users.get(0).getUsername(), actualUserDTO.getUsername(), "Username should match each other");
+        Assertions.assertEquals(this.users.get(0).getDob(), actualUserDTO.getDob(), "Dob should match each other");
+        Assertions.assertEquals(this.users.get(0).getEmail(), actualUserDTO.getEmail(), "Email should match each other");
 
         Mockito.verify(this.userRepository, Mockito.times(1)).findById(1);
         Mockito.verify(this.userMapper, Mockito.times(1)).toUserDTO(ArgumentMatchers.any(User.class));
@@ -106,7 +124,7 @@ public class UserServiceImplTest {
 
         Assertions.assertThrows(
                 ResourceNotFoundException.class,
-                () -> { userServiceImpl.findUserById(10); },
+                () -> userServiceImpl.findUserById(10),
                 "Should throw exception"
         );
 
@@ -123,10 +141,10 @@ public class UserServiceImplTest {
 
         UserDTO actualUserDTO = userServiceImpl.findUserByUsername("username2");
 
-        Assertions.assertEquals(actualUserDTO.getId(), this.users.get(1).getId(), "Id should match each other");
-        Assertions.assertEquals(actualUserDTO.getUsername(), this.users.get(1).getUsername(), "Username should match each other");
-        Assertions.assertEquals(actualUserDTO.getDob(), this.users.get(1).getDob(), "Dob should match each other");
-        Assertions.assertEquals(actualUserDTO.getEmail(), this.users.get(1).getEmail(), "Email should match each other");
+        Assertions.assertEquals(this.users.get(1).getId(), actualUserDTO.getId(), "Id should match each other");
+        Assertions.assertEquals(this.users.get(1).getUsername(), actualUserDTO.getUsername(), "Username should match each other");
+        Assertions.assertEquals(this.users.get(1).getDob(), actualUserDTO.getDob(), "Dob should match each other");
+        Assertions.assertEquals(this.users.get(1).getEmail(), actualUserDTO.getEmail(), "Email should match each other");
 
         Mockito.verify(this.userRepository, Mockito.times(1)).findByUsername("username2");
         Mockito.verify(this.userMapper, Mockito.times(1)).toUserDTO(ArgumentMatchers.any(User.class));
@@ -164,7 +182,6 @@ public class UserServiceImplTest {
         SecurityContextHolder.setContext(securityContext);
         Mockito.when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(userDetails);
         Mockito.when(userDetails.getUsername()).thenReturn("username1");
-        Mockito.when(userMapper.updateUserFromUserDTO(userDTO, this.users.get(0))).thenReturn(this.users.get(0));
         Mockito.when(userRepository.save(ArgumentMatchers.any(User.class))).thenReturn(this.users.get(0));
         Mockito.when(userMapper.toUserDTO(this.users.get(0))).thenReturn(userDTO);
 
@@ -177,7 +194,6 @@ public class UserServiceImplTest {
         Assertions.assertEquals(actualUserDTO.getRoles(), userDTO.getRoles(), "Roles should match each other");
 
         Mockito.verify(this.userRepository, Mockito.times(1)).save(this.users.get(0));
-        Mockito.verify(this.userMapper, Mockito.times(1)).updateUserFromUserDTO(userDTO, this.users.get(0));
         Mockito.verify(this.userMapper, Mockito.times(1)).toUserDTO(this.users.get(0));
     }
 

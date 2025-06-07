@@ -1,7 +1,12 @@
 package vn.com.hieuduongmanhblog.dto;
 
+import jakarta.validation.constraints.NotNull;
+
 public class UserAuthenticationRequestDTO {
+    @NotNull(message = "username cannot be null")
     private String username;
+
+    @NotNull(message = "password cannot be null")
     private String password;
 
     public UserAuthenticationRequestDTO() {

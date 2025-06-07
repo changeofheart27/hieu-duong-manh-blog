@@ -1,21 +1,32 @@
 package vn.com.hieuduongmanhblog.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
 public class PostDTO {
     private Integer id;
-    @NotBlank(message = "title cannot be blank")
+
+    @NotNull(message = "title cannot be null")
     private String title;
-    @NotBlank(message = "description cannot be blank")
+
+    @NotNull(message = "description cannot be null")
     private String description;
-    @NotBlank(message = "content cannot be blank")
+
+    @NotNull(message = "content cannot be null")
     private String content;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
-    @NotBlank(message = "author cannot be blank")
+
     private String postAuthor;
+
+    @NotNull(message = "tags cannot be null")
+    private String tags;
 
     public PostDTO() {
 
@@ -29,14 +40,15 @@ public class PostDTO {
         this.postAuthor = postAuthor;
     }
 
-    public PostDTO(Integer id, String title, String description, String content, LocalDateTime createdAt, LocalDateTime updatedAt, String postAuthor) {
-            this.id = id;
-            this.title = title;
-            this.description = description;
-            this.content = content;
-            this.createdAt = createdAt;
-            this.updatedAt = updatedAt;
-            this.postAuthor = postAuthor;
+    public PostDTO(Integer id, String title, String description, String content, LocalDateTime createdAt, LocalDateTime updatedAt, String postAuthor, String tags) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.content = content;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.postAuthor = postAuthor;
+        this.tags = tags;
     }
 
     public Integer getId() {
@@ -93,5 +105,13 @@ public class PostDTO {
 
     public void setPostAuthor(String postAuthor) {
         this.postAuthor = postAuthor;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 }

@@ -1,6 +1,8 @@
 package vn.com.hieuduongmanhblog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import vn.com.hieuduongmanhblog.dto.UserDTO;
 import vn.com.hieuduongmanhblog.exception.ResourceNotFoundException;
 import vn.com.hieuduongmanhblog.service.JwtUtilService;
@@ -23,6 +25,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,18 +46,22 @@ public class UserControllerTest {
 
     private List<UserDTO> userDTOs;
 
+    DateTimeFormatter dateTimeFormatter;
+
     @BeforeEach
     void setUp() {
         // prepare data to test
-        UserDTO user1 = new UserDTO(1, "username1", LocalDate.of(1999, 7, 2), "username1@email.com", LocalDateTime.now(), null, "ROLE_USER,ROLE_AUTHOR,ROLE_ADMIN");
-        UserDTO user2 = new UserDTO(2, "username2", null, "username2@email.com", LocalDateTime.now(), null, "ROLE_USER");
-        UserDTO user3 = new UserDTO(3, "username3", null, "username3@email.com", LocalDateTime.now(), null, "ROLE_USER");
-        UserDTO user4 = new UserDTO(4, "username4", LocalDate.of(1999, 2, 7), "username4@email.com", LocalDateTime.now(), null, "ROLE_USER");
+        UserDTO user1 = new UserDTO(1, "username1", LocalDate.of(1999, 7, 2), "username1@email.com", "ROLE_USER,ROLE_AUTHOR,ROLE_ADMIN");
+        UserDTO user2 = new UserDTO(2, "username2", null, "username2@email.com", "ROLE_USER");
+        UserDTO user3 = new UserDTO(3, "username3", null, "username3@email.com", "ROLE_USER");
+        UserDTO user4 = new UserDTO(4, "username4", LocalDate.of(1999, 2, 7), "username4@email.com", "ROLE_USER");
         userDTOs = new ArrayList<>();
         userDTOs.add(user1);
         userDTOs.add(user2);
         userDTOs.add(user3);
         userDTOs.add(user4);
+
+        dateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
     }
 
     @AfterEach
@@ -65,26 +72,33 @@ public class UserControllerTest {
     @Test
     @DisplayName("GET OPERATION: Get All Users")
     void testGetAllUsers() throws Exception {
-        Mockito.when(userService.getAllUsers()).thenReturn(this.userDTOs);
+        int pageNumber = 0;
+        int pageSize = 5;
+        Page<UserDTO> userDTOsPage = new PageImpl<>(this.userDTOs);
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/users"))
+        Mockito.when(userService.getAllUsers(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt()))
+                .thenReturn(userDTOsPage);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/users")
+                    .param("page", String.valueOf(pageNumber))
+                    .param("size", String.valueOf(pageSize)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Get All Users Successful"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].username").value("username1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].dob").value(LocalDate.of(1999, 7, 2).toString()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].email").value("username1@email.com"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].roles").isNotEmpty());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].username").value("username1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].dob").value(LocalDate.of(1999, 7, 2).format(dateTimeFormatter)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].email").value("username1@email.com"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].roles").isNotEmpty());
     }
 
     @Test
     @DisplayName("GET OPERATION: Find User By Id Should Return A Valid User")
     void testFindUserByIdSuccess() throws Exception {
-        Mockito.when(userService.findUserById(1)).thenReturn(this.userDTOs.get(2));
+        Mockito.when(userService.findUserById(3)).thenReturn(this.userDTOs.get(2));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/users/{id}", 1))
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/users/{id}", 3))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
@@ -110,7 +124,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("GET OPERATION: Find Users By User username Should Return A Valid User")
-    void testFindUserByUserSuccess() throws Exception {
+    void testFindUserByUsernameSuccess() throws Exception {
         Mockito.when(userService.findUserByUsername("username2")).thenReturn(this.userDTOs.get(1));
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/users?username={username}", "username2"))
@@ -118,7 +132,6 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Get User By username Successful"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(2))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.username").value("username2"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.dob").isEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value("username2@email.com"))
@@ -128,7 +141,7 @@ public class UserControllerTest {
     @Test
     @DisplayName("PUT OPERATION: Update Existing User Should Return Updated User")
     void testUpdateUserSuccess() throws Exception {
-        UserDTO updatedUserDTO = new UserDTO(4, "username4", LocalDate.of(1999, 2, 7), "updatedusername4@email.com", LocalDateTime.now(), LocalDateTime.now(), "ROLE_USER");
+        UserDTO updatedUserDTO = new UserDTO(4, "username4", LocalDate.of(1999, 2, 7), "updatedusername4@email.com", "ROLE_USER");
 
         // The mock call MUST use any instead of a concrete object
         Mockito.when(userService.updateUserById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(UserDTO.class))).thenReturn(updatedUserDTO);
@@ -141,9 +154,9 @@ public class UserControllerTest {
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(updatedUserDTO.getId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(4))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.username").value(updatedUserDTO.getUsername()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.dob").value(updatedUserDTO.getDob().toString()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.dob").value(updatedUserDTO.getDob().format(dateTimeFormatter)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value(updatedUserDTO.getEmail()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.roles").value(updatedUserDTO.getRoles()));
 
@@ -154,7 +167,6 @@ public class UserControllerTest {
     @DisplayName("PUT OPERATION: Update Existing User Should Throw Exception")
     void testUpdateUserFailed() throws Exception {
         UserDTO invalidUserDTO = new UserDTO();
-        invalidUserDTO.setId(0);
         invalidUserDTO.setUsername("username0");
         invalidUserDTO.setDob(LocalDate.of(2024, 6, 5));
         invalidUserDTO.setEmail("username0@email.com");

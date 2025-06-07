@@ -48,7 +48,7 @@ public class JwtUtilService {
     }
 
     private Date extractExpirationDate(String token) {
-        return extractClaim(token, claims -> claims.getExpiration());
+        return extractClaim(token, Claims::getExpiration);
     }
 
 
