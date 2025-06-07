@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import vn.com.hieuduongmanhblog.dto.PostDTO;
 import vn.com.hieuduongmanhblog.entity.Role;
+import vn.com.hieuduongmanhblog.entity.RoleName;
 import vn.com.hieuduongmanhblog.entity.User;
 import vn.com.hieuduongmanhblog.exception.ResourceNotFoundException;
 import vn.com.hieuduongmanhblog.service.JwtUtilService;
@@ -52,7 +53,7 @@ public class PostControllerTest {
     void setUp() {
         // prepare data to test
         objectMapper = new ObjectMapper();
-        User user = new User(1, "username", "password", LocalDate.of(1999, 7, 2), "username@email.com", LocalDateTime.now(), null, "avatar1.png", Set.of(new Role("ROLE_USER")));
+        User user = new User(1, "username", "password", LocalDate.of(1999, 7, 2), "username@email.com", LocalDateTime.now(), null, "avatar1.png", Set.of(new Role(1, RoleName.USER)));
         PostDTO post1 = new PostDTO(1, "Title 1", "Description 1", "Content 1", user.getUsername());
         PostDTO post2 = new PostDTO(2, "Title 2", "Description 2", "Content 2", user.getUsername());
         PostDTO post3 = new PostDTO(3, "Title 3", "Description 3", "Content 3", null);
@@ -184,6 +185,7 @@ public class PostControllerTest {
         createdPostDTO.setDescription("New Post Description 1");
         createdPostDTO.setContent("New Post Content 1");
         createdPostDTO.setPostAuthor("username");
+        createdPostDTO.setTags("#java");
 
         // The mock call MUST use any instead of a concrete object
         Mockito.when(postService.createPost(ArgumentMatchers.any(PostDTO.class))).thenReturn(createdPostDTO);
@@ -217,6 +219,7 @@ public class PostControllerTest {
         updatedPostDTO.setDescription("Updated Post Description 1");
         updatedPostDTO.setContent("Updated Post Content 1");
         updatedPostDTO.setPostAuthor("username");
+        updatedPostDTO.setTags("#java");
 
         // The mock call MUST use any instead of a concrete object
         Mockito.when(postService.updatePostById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(PostDTO.class))).thenReturn(updatedPostDTO);
@@ -249,6 +252,7 @@ public class PostControllerTest {
         updatedPostDTO.setDescription("Updated Post Description 1");
         updatedPostDTO.setContent("Updated Post Content 1");
         updatedPostDTO.setPostAuthor("username");
+        updatedPostDTO.setTags("#java");
 
         // The mock call MUST use any instead of a concrete object
         Mockito.when(postService.updatePostById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(PostDTO.class)))

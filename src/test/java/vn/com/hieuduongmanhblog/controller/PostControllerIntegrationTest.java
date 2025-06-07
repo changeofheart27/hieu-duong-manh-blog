@@ -152,6 +152,7 @@ public class PostControllerIntegrationTest {
         createdPostDTO.setTitle("Demo New Post Title 6");
         createdPostDTO.setDescription("Demo New Post Description 6");
         createdPostDTO.setContent("Demo New Post Content 6");
+        createdPostDTO.setTags("#java");
 
         this.mockMvc.perform(
                         MockMvcRequestBuilders
@@ -168,7 +169,8 @@ public class PostControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value(createdPostDTO.getTitle()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.description").value(createdPostDTO.getDescription()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value(createdPostDTO.getContent()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postAuthor").value("hieuduongm"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postAuthor").value("hieuduongm"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.tags").value(createdPostDTO.getTags()));
 
         this.mockMvc.perform(
                 MockMvcRequestBuilders
@@ -187,6 +189,7 @@ public class PostControllerIntegrationTest {
         updatedPostDTO.setTitle("Demo Edited Post Title 3");
         updatedPostDTO.setDescription("Demo Edited Post Description 3");
         updatedPostDTO.setContent("Demo Edited Post Content 3");
+        updatedPostDTO.setTags("#java");
 
         this.mockMvc.perform(
                 MockMvcRequestBuilders
@@ -203,7 +206,8 @@ public class PostControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value(updatedPostDTO.getTitle()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.description").value(updatedPostDTO.getDescription()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value(updatedPostDTO.getContent()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postAuthor").value("hieuduongm"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postAuthor").value("hieuduongm"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.tags").value(updatedPostDTO.getTags()));
 
         this.mockMvc.perform(
                 MockMvcRequestBuilders
@@ -221,6 +225,7 @@ public class PostControllerIntegrationTest {
         updatedPostDTO.setTitle("Demo Edited Post Title 10");
         updatedPostDTO.setDescription("Demo Edited Post Description 10");
         updatedPostDTO.setContent("Demo Edited Post Content 10");
+        updatedPostDTO.setTags("#java");
 
         this.mockMvc.perform(
                 MockMvcRequestBuilders

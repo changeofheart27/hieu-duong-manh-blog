@@ -30,7 +30,8 @@ public class Role {
 
     }
 
-    public Role(RoleName roleName) {
+    public Role(Integer id, RoleName roleName) {
+        this.id = id;
         this.roleName = roleName;
     }
 

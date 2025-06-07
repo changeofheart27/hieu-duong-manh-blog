@@ -68,12 +68,12 @@ public class UserControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(200)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Get All Users Successful")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data", Matchers.hasSize(4)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].username").value("hieuduongm"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].dob").value(LocalDate.of(1999, 7, 2).toString()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].email").value("hieudhanu27@gmail.com"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].roles").isNotEmpty());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content", Matchers.hasSize(4)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].username").value("hieuduongm"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].dob").value(LocalDate.of(1999, 7, 2).toString()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].email").value("hieudhanu27@gmail.com"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].roles").isNotEmpty());
     }
 
     @Test
@@ -171,7 +171,7 @@ public class UserControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.username").value("phuongcaot"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.dob").value(updatedUserDTO.getDob().toString()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value(updatedUserDTO.getEmail()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.roles").value("ROLE_USER"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.roles").value("USER"));
 
         this.mockMvc.perform(
                         MockMvcRequestBuilders

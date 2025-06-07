@@ -148,7 +148,7 @@ public class UserControllerTest {
 
         this.mockMvc.perform(
                         MockMvcRequestBuilders
-                                .patch("/api/v1/users/{id}", 4)
+                                .put("/api/v1/users/{id}", 4)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(updatedUserDTO))
                 )
@@ -179,7 +179,7 @@ public class UserControllerTest {
 
         this.mockMvc.perform(
                         MockMvcRequestBuilders
-                                .patch("/api/v1/users/{id}", 0)
+                                .put("/api/v1/users/{id}", 0)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(invalidUserDTO))
                 )

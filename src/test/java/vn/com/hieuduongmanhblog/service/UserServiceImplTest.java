@@ -8,6 +8,7 @@ import vn.com.hieuduongmanhblog.dto.UserDTO;
 import vn.com.hieuduongmanhblog.dto.mapper.UserMapper;
 import vn.com.hieuduongmanhblog.entity.Post;
 import vn.com.hieuduongmanhblog.entity.Role;
+import vn.com.hieuduongmanhblog.entity.RoleName;
 import vn.com.hieuduongmanhblog.entity.User;
 import vn.com.hieuduongmanhblog.exception.ResourceNotFoundException;
 import vn.com.hieuduongmanhblog.repository.UserRepository;
@@ -46,12 +47,9 @@ public class UserServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        Role userRole = new Role();
-        userRole.setRoleName("ROLE_USER");
-        Role authorRole = new Role();
-        userRole.setRoleName("ROLE_AUTHOR");
-        Role adminRole = new Role();
-        userRole.setRoleName("ROLE_ADMIN");
+        Role userRole = new Role(1, RoleName.USER);
+        Role authorRole = new Role(2, RoleName.AUTHOR);
+        Role adminRole = new Role(3, RoleName.ADMIN);
         // prepare data to test
         User user1 = new User(1, "username1", "password1", null, "username1@email.com", LocalDateTime.now(), LocalDateTime.now(), "avatar1.png", Set.of(userRole, authorRole, adminRole));
         User user2 = new User(2, "username2", "password2", null, "username2@email.com", LocalDateTime.now(), LocalDateTime.now(), "avatar2.png", Set.of(userRole, authorRole));
@@ -97,7 +95,7 @@ public class UserServiceImplTest {
         Assertions.assertNotNull(actualUserDTOs);
         Assertions.assertEquals(actualUserDTOs.getContent().size(), this.users.size(), "Size should be 4");
 
-        Mockito.verify(this.userRepository, Mockito.times(1)).findAll();
+        Mockito.verify(this.userRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(PageRequest.class));
         Mockito.verify(this.userMapper, Mockito.times(4)).toUserDTO(ArgumentMatchers.any(User.class));
     }
 
@@ -137,7 +135,7 @@ public class UserServiceImplTest {
     @Test
     @DisplayName("Find User By username Should Return A Valid User")
     void testFindUserByUsernameSuccess() {
-        UserDTO userDTO = new UserDTO(1, "username2", null, "username2@email.com", "ROLE_ADMIN,ROLE_AUTHOR");
+        UserDTO userDTO = new UserDTO(2, "username2", null, "username2@email.com", "ROLE_ADMIN,ROLE_AUTHOR");
         Mockito.when(userRepository.findByUsername("username2")).thenReturn(Optional.of(users.get(1)));
         Mockito.when(userMapper.toUserDTO(ArgumentMatchers.any(User.class))).thenReturn(userDTO);
 
@@ -184,7 +182,6 @@ public class UserServiceImplTest {
         SecurityContextHolder.setContext(securityContext);
         Mockito.when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(userDetails);
         Mockito.when(userDetails.getUsername()).thenReturn("username1");
-        Mockito.when(userMapper.toUserEntity(userDTO)).thenReturn(this.users.get(0));
         Mockito.when(userRepository.save(ArgumentMatchers.any(User.class))).thenReturn(this.users.get(0));
         Mockito.when(userMapper.toUserDTO(this.users.get(0))).thenReturn(userDTO);
 
@@ -197,7 +194,6 @@ public class UserServiceImplTest {
         Assertions.assertEquals(actualUserDTO.getRoles(), userDTO.getRoles(), "Roles should match each other");
 
         Mockito.verify(this.userRepository, Mockito.times(1)).save(this.users.get(0));
-        Mockito.verify(this.userMapper, Mockito.times(1)).toUserEntity(userDTO);
         Mockito.verify(this.userMapper, Mockito.times(1)).toUserDTO(this.users.get(0));
     }
 

@@ -8,6 +8,7 @@ import vn.com.hieuduongmanhblog.dto.PostDTO;
 import vn.com.hieuduongmanhblog.dto.mapper.PostMapper;
 import vn.com.hieuduongmanhblog.entity.Post;
 import vn.com.hieuduongmanhblog.entity.Role;
+import vn.com.hieuduongmanhblog.entity.RoleName;
 import vn.com.hieuduongmanhblog.entity.User;
 import vn.com.hieuduongmanhblog.exception.ResourceNotFoundException;
 import vn.com.hieuduongmanhblog.repository.PostRepository;
@@ -57,8 +58,8 @@ public class PostServiceImplTest {
     @BeforeEach
     void setUp() {
         // prepare data to test
-        user1 = new User(1, "username", "password", LocalDate.of(1999, 7, 2), "username@email.com", LocalDateTime.now(), null, "avatar1.png", Set.of(new Role("ROLE_USER")));
-        User user2 = new User(2, "username2", "password2", LocalDate.of(2000, 11, 22), "username2@email.com", LocalDateTime.now(), null, "avatar2.png", Set.of(new Role("ROLE_USER")));
+        user1 = new User(1, "username", "password", LocalDate.of(1999, 7, 2), "username@email.com", LocalDateTime.now(), null, "avatar1.png", Set.of(new Role(1, RoleName.USER)));
+        User user2 = new User(2, "username2", "password2", LocalDate.of(2000, 11, 22), "username2@email.com", LocalDateTime.now(), null, "avatar2.png", Set.of(new Role(2, RoleName.USER)));
         Post post1 = new Post(1, "Title 1", "Description 1", "Content 1", LocalDateTime.now(), LocalDateTime.now(), user1);
         Post post2 = new Post(2, "Title 2", "Description 2", "Content 2", LocalDateTime.now(), LocalDateTime.now(), user1);
         Post post3 = new Post(3, "Title 3", "Description 3", "Content 3", LocalDateTime.now(), LocalDateTime.now(), user2);
