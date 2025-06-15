@@ -1,7 +1,10 @@
 package vn.com.hieuduongmanhblog.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import vn.com.hieuduongmanhblog.dto.UserAuthenticationRequestDTO;
 import vn.com.hieuduongmanhblog.dto.UserRegistrationRequestDTO;
 import vn.com.hieuduongmanhblog.dto.ResponseDTO;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 
+@Tag(name = "Authentication Controller", description = "Endpoints for user authentication")
 @RestController
 @RequestMapping("/api/v1/auth")
 public class JwtAuthenticationController {
@@ -24,15 +28,27 @@ public class JwtAuthenticationController {
         this.authenticationService = authenticationService;
     }
 
+    @Operation(
+            summary = "User Registration",
+            description = "Register new user on the system using username and password."
+    )
     @PostMapping("/register")
-    public ResponseDTO registerUser(@Valid @RequestBody UserRegistrationRequestDTO request) {
+    public ResponseEntity<ResponseDTO> registerUser(@Valid @RequestBody UserRegistrationRequestDTO request) {
         String jwtToken = authenticationService.registerUser(request);
-        return new ResponseDTO(HttpStatus.CREATED, "Register New User Successful", LocalDateTime.now(), jwtToken);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new ResponseDTO(HttpStatus.CREATED.value(), "Register New User Successful", LocalDateTime.now(), jwtToken));
     }
 
+    @Operation(
+            summary = "User Authentication",
+            description = "Login the system using username and password."
+    )
     @PostMapping("/login")
-    public ResponseDTO authenticateUser(@Valid @RequestBody UserAuthenticationRequestDTO request) {
+    public ResponseEntity<ResponseDTO> authenticateUser(@Valid @RequestBody UserAuthenticationRequestDTO request) {
         String jwtToken = authenticationService.authenticateUser(request);
-        return new ResponseDTO(HttpStatus.OK, "Login Successful", LocalDateTime.now(), jwtToken);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDTO(HttpStatus.OK.value(), "Login Successful", LocalDateTime.now(), jwtToken));
     }
 }

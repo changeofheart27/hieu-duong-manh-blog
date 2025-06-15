@@ -26,22 +26,30 @@ public class ImageStorageController {
     }
 
     @PostMapping("/upload")
-    public ResponseDTO uploadImage(@RequestPart MultipartFile imageFile) {
+    public ResponseEntity<ResponseDTO> uploadImage(@RequestPart MultipartFile imageFile) {
         try {
             String uploadedImageName = this.imageService.uploadImage(imageFile);
-            return new ResponseDTO(HttpStatus.OK, "Upload Image Successful: " + uploadedImageName, LocalDateTime.now());
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new ResponseDTO(HttpStatus.OK.value(), "Upload Image Successful: " + uploadedImageName, LocalDateTime.now()));
         } catch (IOException e) {
-            return new ResponseDTO(HttpStatus.BAD_REQUEST, "Upload Image Failed: " + e.getMessage(), LocalDateTime.now());
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseDTO(HttpStatus.BAD_REQUEST.value(), "Upload Image Failed: " + e.getMessage(), LocalDateTime.now()));
         }
     }
 
     @GetMapping("/")
-    public ResponseDTO getAllImageUrls() {
+    public ResponseEntity<ResponseDTO> getAllImageUrls() {
         try {
         List<String> imageUrls = this.imageService.getAllImageUrls();
-        return new ResponseDTO(HttpStatus.OK, "Get All Image URLs Successful", LocalDateTime.now(), imageUrls);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDTO(HttpStatus.OK.value(), "Get All Image URLs Successful", LocalDateTime.now(), imageUrls));
         } catch (IOException e) {
-            return new ResponseDTO(HttpStatus.BAD_REQUEST, "Get All Image URLs Failed: " + e.getMessage(), LocalDateTime.now());
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseDTO(HttpStatus.BAD_REQUEST.value(), "Get All Image URLs Failed: " + e.getMessage(), LocalDateTime.now()));
         }
     }
 

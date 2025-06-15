@@ -7,6 +7,7 @@ import vn.com.hieuduongmanhblog.entity.Role;
 import vn.com.hieuduongmanhblog.entity.RoleName;
 import vn.com.hieuduongmanhblog.entity.User;
 import vn.com.hieuduongmanhblog.exception.ResourceNotFoundException;
+import vn.com.hieuduongmanhblog.exception.UserAlreadyExistAuthenticationException;
 import vn.com.hieuduongmanhblog.repository.RoleRepository;
 import vn.com.hieuduongmanhblog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
 
     public String registerUser(UserRegistrationRequestDTO request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("User with username " + request.getUsername() + " already exists!");
+            throw new UserAlreadyExistAuthenticationException("User with username " + request.getUsername() + " already exists!");
         }
 
         User newUser = new User(

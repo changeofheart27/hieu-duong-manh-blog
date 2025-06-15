@@ -46,8 +46,6 @@ public class UserControllerTest {
 
     private List<UserDTO> userDTOs;
 
-    DateTimeFormatter dateTimeFormatter;
-
     @BeforeEach
     void setUp() {
         // prepare data to test
@@ -60,8 +58,6 @@ public class UserControllerTest {
         userDTOs.add(user2);
         userDTOs.add(user3);
         userDTOs.add(user4);
-
-        dateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
     }
 
     @AfterEach
@@ -88,7 +84,7 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Get All Users Successful"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].username").value("username1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].dob").value(LocalDate.of(1999, 7, 2).format(dateTimeFormatter)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].dob").value(LocalDate.of(1999, 7, 2).toString()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].email").value("username1@email.com"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].roles").isNotEmpty());
     }
@@ -156,7 +152,7 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(4))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.username").value(updatedUserDTO.getUsername()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.dob").value(updatedUserDTO.getDob().format(dateTimeFormatter)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.dob").value(updatedUserDTO.getDob().toString()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value(updatedUserDTO.getEmail()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.roles").value(updatedUserDTO.getRoles()));
 

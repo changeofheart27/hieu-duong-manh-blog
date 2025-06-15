@@ -2,6 +2,7 @@ package vn.com.hieuduongmanhblog.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import vn.com.hieuduongmanhblog.dto.PostDTO;
 import vn.com.hieuduongmanhblog.dto.ResponseDTO;
 import vn.com.hieuduongmanhblog.service.PostService;
@@ -22,45 +23,57 @@ public class PostController {
     }
 
     @GetMapping(value = "/posts")
-    public ResponseDTO getAllPosts(
+    public ResponseEntity<ResponseDTO> getAllPosts(
             @RequestParam(value = "page", defaultValue = "0", required = false) int pageNumber,
             @RequestParam(value = "size", defaultValue = "5", required = false) int pageSize
     ) {
         Page<PostDTO> posts = postService.getAllPosts(pageNumber, pageSize);
-        return new ResponseDTO(HttpStatus.OK, "Get All Posts Successful", LocalDateTime.now(), posts);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDTO(HttpStatus.OK.value(), "Get All Posts Successful", LocalDateTime.now(), posts));
     }
 
     @GetMapping("/posts/{postId}")
-    public ResponseDTO findPostById(@PathVariable int postId) {
+    public ResponseEntity<ResponseDTO> findPostById(@PathVariable int postId) {
         PostDTO givenPost = postService.findPostById(postId);
-        return new ResponseDTO(HttpStatus.OK, "Get Post By ID Successful", LocalDateTime.now(), givenPost);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDTO(HttpStatus.OK.value(), "Get Post By ID Successful", LocalDateTime.now(), givenPost));
     }
 
     @GetMapping(value = "/posts", params = {"username"})
-    public ResponseDTO findPostsByUser(
+    public ResponseEntity<ResponseDTO> findPostsByUser(
             @RequestParam(value = "username") String username,
             @RequestParam(value = "page", defaultValue = "0", required = false) int pageNumber,
             @RequestParam(value = "size", defaultValue = "5", required = false) int pageSize
     ) {
         Page<PostDTO> givenPosts = postService.findPostsByUser(username, pageNumber, pageSize);
-        return new ResponseDTO(HttpStatus.OK, "Get Posts By Username Successful", LocalDateTime.now(), givenPosts);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDTO(HttpStatus.OK.value(), "Get Posts By Username Successful", LocalDateTime.now(), givenPosts));
     }
 
     @PostMapping("/posts")
-    public ResponseDTO createNewPost(@Valid @RequestBody PostDTO newPost) {
+    public ResponseEntity<ResponseDTO> createNewPost(@Valid @RequestBody PostDTO newPost) {
         PostDTO createdPost = postService.createPost(newPost);
-        return new ResponseDTO(HttpStatus.CREATED, "Create New Post Successful", LocalDateTime.now(), createdPost);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new ResponseDTO(HttpStatus.CREATED.value(), "Create New Post Successful", LocalDateTime.now(), createdPost));
     }
 
     @PutMapping("/posts/{postId}")
-    public ResponseDTO updateExistingPost(@PathVariable int postId, @Valid @RequestBody PostDTO newPost) {
+    public ResponseEntity<ResponseDTO> updateExistingPost(@PathVariable int postId, @Valid @RequestBody PostDTO newPost) {
         PostDTO updatedPost = postService.updatePostById(postId, newPost);
-        return new ResponseDTO(HttpStatus.OK, "Update Post Successful", LocalDateTime.now(), updatedPost);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDTO(HttpStatus.OK.value(), "Update Post Successful", LocalDateTime.now(), updatedPost));
     }
 
     @DeleteMapping("/posts/{postId}")
-    public ResponseDTO deleteUserById(@PathVariable int postId) {
+    public ResponseEntity<ResponseDTO> deleteUserById(@PathVariable int postId) {
         postService.deletePostById(postId);
-        return new ResponseDTO(HttpStatus.OK, "Delete Post Successful", LocalDateTime.now());
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDTO(HttpStatus.OK.value(), "Delete Post Successful", LocalDateTime.now()));
     }
 }

@@ -1,53 +1,51 @@
 package vn.com.hieuduongmanhblog.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
 
-public class ResponseDTO extends ResponseEntity<ResponseDTO.Payload> {
+@Schema(description = "Standardized response message")
+public class ResponseDTO {
+    @Schema(description = "HTTP status code", example = "200")
+    private final int status;
 
-    public ResponseDTO(HttpStatusCode status, String message, LocalDateTime timestamp) {
-        super(new Payload(status.value(), message, timestamp), status);
+    @Schema(description = "Response message", example = "Get All Users Successful")
+    private final String message;
+
+    @Schema(description = "Creation timestamp", example = "2024-01-01T12:00:00")
+    private final LocalDateTime timestamp;
+
+    @Schema(description = "Response data")
+    private Object data;
+
+    public ResponseDTO(int status, String message, LocalDateTime timestamp) {
+        this.status = status;
+        this.message = message;
+        this.timestamp = timestamp;
     }
 
-    public ResponseDTO(HttpStatusCode status, String message, LocalDateTime timestamp, Object data) {
-        super(new Payload(status.value(), message, timestamp, data), status);
+    public ResponseDTO(int status, String message, LocalDateTime timestamp, Object data) {
+        this.status = status;
+        this.message = message;
+        this.timestamp = timestamp;
+        this.data = data;
     }
 
-    public static class Payload {
-        private final int status;
-        private final String message;
-        private final LocalDateTime timestamp;
-        private Object data;
+    public int getStatus() {
+        return status;
+    }
 
-        public Payload(int status, String message, LocalDateTime timestamp) {
-            this.status = status;
-            this.message = message;
-            this.timestamp = timestamp;
-        }
+    public String getMessage() {
+        return message;
+    }
 
-        public Payload(int status, String message, LocalDateTime timestamp, Object data) {
-            this.status = status;
-            this.message = message;
-            this.timestamp = timestamp;
-            this.data = data;
-        }
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
 
-        public int getStatus() {
-            return status;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public LocalDateTime getTimestamp() {
-            return timestamp;
-        }
-
-        public Object getData() {
-            return data;
-        }
+    public Object getData() {
+        return data;
     }
 }

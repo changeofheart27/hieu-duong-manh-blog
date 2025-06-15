@@ -22,32 +22,42 @@ public class TagController {
     }
 
     @GetMapping("/tags")
-    public ResponseDTO getAllTags() {
+    public ResponseEntity<ResponseDTO> getAllTags() {
         List<Tag> tags = tagService.getAllTags();
-        return new ResponseDTO(HttpStatus.OK, "Get All Tags Successful", LocalDateTime.now(), tags);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDTO(HttpStatus.OK.value(), "Get All Tags Successful", LocalDateTime.now(), tags));
     }
 
     @GetMapping("/tags/{tagId}")
-    public ResponseDTO findTagById(@PathVariable int tagId) {
+    public ResponseEntity<ResponseDTO> findTagById(@PathVariable int tagId) {
         Tag givenTag = tagService.findTagById(tagId);
-        return new ResponseDTO(HttpStatus.OK, "Get Tag By ID Successful", LocalDateTime.now(), givenTag);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDTO(HttpStatus.OK.value(), "Get Tag By ID Successful", LocalDateTime.now(), givenTag));
     }
 
     @PostMapping("/tags")
-    public ResponseDTO createNewTag(@RequestBody Tag newTag) {
+    public ResponseEntity<ResponseDTO> createNewTag(@RequestBody Tag newTag) {
         Tag createdTag = tagService.createTag(newTag);
-        return new ResponseDTO(HttpStatus.CREATED, "Create New Tag Successful", LocalDateTime.now(), createdTag);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new ResponseDTO(HttpStatus.CREATED.value(), "Create New Tag Successful", LocalDateTime.now(), createdTag));
     }
 
     @PutMapping("/tags/{tagId}")
-    public ResponseDTO updateExistingTag(@PathVariable int tagId, @RequestBody Tag newTag) {
+    public ResponseEntity<ResponseDTO> updateExistingTag(@PathVariable int tagId, @RequestBody Tag newTag) {
         Tag updatedTag = tagService.updateTagById(tagId, newTag);
-        return new ResponseDTO(HttpStatus.OK, "Update Tag Successful", LocalDateTime.now(), updatedTag);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDTO(HttpStatus.OK.value(), "Update Tag Successful", LocalDateTime.now(), updatedTag));
     }
 
     @DeleteMapping("/tags/{tagId}")
-    public ResponseDTO deleteUserById(@PathVariable int tagId) {
+    public ResponseEntity<ResponseDTO> deleteTagById(@PathVariable int tagId) {
         tagService.deleteTagById(tagId);
-        return new ResponseDTO(HttpStatus.OK, "Delete Tag Successful", LocalDateTime.now());
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDTO(HttpStatus.OK.value(), "Delete Tag Successful", LocalDateTime.now()));
     }
 }
