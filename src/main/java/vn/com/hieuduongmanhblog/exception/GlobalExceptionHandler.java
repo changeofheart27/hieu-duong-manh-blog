@@ -83,7 +83,7 @@ public class GlobalExceptionHandler {
                 .body(new ResponseDTO(HttpStatus.FORBIDDEN.value(), exception.getMessage(), LocalDateTime.now()));
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
+    @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ResponseDTO> handleAuthenticationException(AuthenticationException exception) {
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
