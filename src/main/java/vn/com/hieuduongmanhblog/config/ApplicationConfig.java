@@ -26,12 +26,11 @@ public class ApplicationConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
-            User foundUser =  userRepository
+            return userRepository
                     .findByUsername(username)
-                    .orElseThrow(
-                            () -> new UsernameNotFoundException("User with username " + username + " not found!")
+                    .orElseThrow(() ->
+                            new UsernameNotFoundException("User with username " + username + " not found!")
                     );
-            return foundUser;
         };
     }
 

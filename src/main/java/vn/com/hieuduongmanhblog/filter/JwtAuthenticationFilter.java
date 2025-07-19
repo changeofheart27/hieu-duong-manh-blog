@@ -1,7 +1,8 @@
 package vn.com.hieuduongmanhblog.filter;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import vn.com.hieuduongmanhblog.service.JwtUtilService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,17 +24,17 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtilService jwtService;
     private final UserDetailsService userDetailsService;
-    private final HandlerExceptionResolver handlerExceptionResolver;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
 
     @Autowired
     public JwtAuthenticationFilter(
             JwtUtilService jwtService,
             UserDetailsService userDetailsService,
-            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver
+            @Qualifier("jwtAuthenticationEntryPoint") AuthenticationEntryPoint authenticationEntryPoint
     ) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
-        this.handlerExceptionResolver = handlerExceptionResolver;
+        this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
     @Override
@@ -64,8 +65,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         } catch (Exception exception) {
-            // handle JWT exceptions here (401, 403)
-            handlerExceptionResolver.resolveException(request, response, null, exception);
+            authenticationEntryPoint.commence(request, response,
+                    new InsufficientAuthenticationException(exception.getMessage(), exception));
         }
     }
 }

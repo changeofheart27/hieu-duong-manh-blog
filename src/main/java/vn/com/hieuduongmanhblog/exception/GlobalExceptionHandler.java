@@ -1,13 +1,8 @@
 package vn.com.hieuduongmanhblog.exception;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -56,38 +51,11 @@ public class GlobalExceptionHandler {
                 .body(new ResponseDTO(HttpStatus.UNAUTHORIZED.value(), exception.getMessage(), LocalDateTime.now()));
     }
 
-    @ExceptionHandler(SignatureException.class)
-    public ResponseEntity<ResponseDTO> handleSignatureException(SignatureException exception) {
+    @ExceptionHandler(UserAlreadyExistAuthenticationException.class)
+    public ResponseEntity<ResponseDTO> handleUserAlreadyExistAuthenticationException(UserAlreadyExistAuthenticationException exception) {
         return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(new ResponseDTO(HttpStatus.UNAUTHORIZED.value(), exception.getMessage(), LocalDateTime.now()));
-    }
-
-    @ExceptionHandler(MalformedJwtException.class)
-    public ResponseEntity<ResponseDTO> handleMalformedJwtExceptionException(MalformedJwtException exception) {
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(new ResponseDTO(HttpStatus.UNAUTHORIZED.value(), exception.getMessage(), LocalDateTime.now()));
-    }
-
-    @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<ResponseDTO> handleExpiredJwtException(ExpiredJwtException exception) {
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO(HttpStatus.UNAUTHORIZED.value(), exception.getMessage(), LocalDateTime.now()));
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ResponseDTO> handleAccessDeniedException(AccessDeniedException exception) {
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(new ResponseDTO(HttpStatus.FORBIDDEN.value(), exception.getMessage(), LocalDateTime.now()));
-    }
-
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ResponseDTO> handleAuthenticationException(AuthenticationException exception) {
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(new ResponseDTO(HttpStatus.UNAUTHORIZED.value(), exception.getMessage(), LocalDateTime.now()));
+                .status(HttpStatus.CONFLICT)
+                .body(new ResponseDTO(HttpStatus.CONFLICT.value(), exception.getMessage(), LocalDateTime.now()));
     }
 
     @ExceptionHandler(Exception.class)

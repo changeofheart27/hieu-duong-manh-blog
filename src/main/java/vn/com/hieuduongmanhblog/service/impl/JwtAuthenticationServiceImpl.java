@@ -1,5 +1,6 @@
 package vn.com.hieuduongmanhblog.service.impl;
 
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import vn.com.hieuduongmanhblog.dto.UserAuthenticationRequestDTO;
 import vn.com.hieuduongmanhblog.dto.UserRegistrationRequestDTO;
@@ -13,14 +14,12 @@ import vn.com.hieuduongmanhblog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import vn.com.hieuduongmanhblog.service.AuthenticationService;
 import vn.com.hieuduongmanhblog.service.JwtUtilService;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -72,10 +71,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
                         request.getPassword()
                 )
         );
-        if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(request.getUsername());
-        } else {
-            throw new UsernameNotFoundException("User with username " + request.getUsername() + " not found!");
-        }
+        User user = (User) authentication.getPrincipal();
+        return jwtService.generateToken(user.getUsername());
     }
 }
