@@ -104,7 +104,7 @@ public class PostServiceImpl implements PostService {
             throw new RuntimeException("Unable to update Post by user - " + postToUpdate.getUser().getUsername());
         }
 
-        postToUpdate.setUpdatedAt(LocalDateTime.now());
+        postMapper.updatePostFromDTO(newPost, postToUpdate);
 
         Post updatedPost = postRepository.save(postToUpdate);
         return postMapper.toPostDTO(updatedPost);

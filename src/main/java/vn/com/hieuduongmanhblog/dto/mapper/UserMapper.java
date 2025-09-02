@@ -56,6 +56,16 @@ public class UserMapper {
         return user;
     }
 
+    public void updateUserFromDTO(UserDTO userDTO, User existingUser) {
+        if (userDTO.getDob() != null && !userDTO.getDob().toString().isEmpty()) {
+            existingUser.setDob(userDTO.getDob());
+        }
+        if (userDTO.getEmail() != null && !userDTO.getEmail().isEmpty()) {
+            existingUser.setEmail(userDTO.getEmail());
+        }
+        existingUser.setUpdatedAt(LocalDateTime.now());
+    }
+
     public String mapRoles(Set<Role> roles) {
         return roles
                 .stream()

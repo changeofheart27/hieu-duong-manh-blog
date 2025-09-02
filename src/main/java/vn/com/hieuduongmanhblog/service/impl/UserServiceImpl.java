@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Unable to update User with username - " + userToUpdate.getUsername());
         }
 
-        userToUpdate.setUpdatedAt(LocalDateTime.now());
+        userMapper.updateUserFromDTO(newUserData, userToUpdate);
 
         User updatedUser = this.userRepository.save(userToUpdate);
         return this.userMapper.toUserDTO(updatedUser);

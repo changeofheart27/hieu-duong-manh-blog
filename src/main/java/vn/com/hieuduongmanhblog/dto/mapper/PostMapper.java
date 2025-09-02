@@ -8,6 +8,7 @@ import vn.com.hieuduongmanhblog.entity.Role;
 import vn.com.hieuduongmanhblog.entity.Tag;
 import vn.com.hieuduongmanhblog.repository.TagRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -47,6 +48,24 @@ public class PostMapper {
 
         return post;
     }
+
+    public void updatePostFromDTO(PostDTO postDTO, Post existingPost) {
+        if (postDTO.getTitle() != null && !postDTO.getTitle().isEmpty()) {
+            existingPost.setTitle(postDTO.getTitle());
+        }
+        if (postDTO.getDescription() != null && !postDTO.getDescription().isEmpty()) {
+            existingPost.setDescription(postDTO.getDescription());
+        }
+        if (postDTO.getContent() != null && !postDTO.getContent().isEmpty()) {
+            existingPost.setContent(postDTO.getContent());
+        }
+        if (postDTO.getTags() != null && !postDTO.getTags().isEmpty()) {
+            existingPost.setTags(mapTags(postDTO.getTags()));
+        }
+
+        existingPost.setUpdatedAt(LocalDateTime.now());
+    }
+
 
     public String mapTags(Set<Tag> tags) {
         return tags
