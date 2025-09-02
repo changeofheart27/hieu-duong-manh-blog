@@ -86,12 +86,6 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Unable to update User with username - " + userToUpdate.getUsername());
         }
 
-        if (newUserData.getDob() != null && !newUserData.getDob().toString().isEmpty()) {
-            userToUpdate.setDob(newUserData.getDob());
-        }
-        if (newUserData.getEmail() != null && !newUserData.getEmail().isEmpty()) {
-            userToUpdate.setEmail(newUserData.getEmail());
-        }
         userToUpdate.setUpdatedAt(LocalDateTime.now());
 
         User updatedUser = this.userRepository.save(userToUpdate);

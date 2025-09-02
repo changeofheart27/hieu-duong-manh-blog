@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import vn.com.hieuduongmanhblog.dto.UserAuthenticationRequestDTO;
 import vn.com.hieuduongmanhblog.dto.UserRegistrationRequestDTO;
+import vn.com.hieuduongmanhblog.exception.JwtAuthenticationEntryPoint;
 import vn.com.hieuduongmanhblog.service.AuthenticationService;
 import vn.com.hieuduongmanhblog.service.JwtUtilService;
 
@@ -34,6 +35,9 @@ public class JwtAuthenticationControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Test
     @DisplayName("POST OPERATION: Create A New User")

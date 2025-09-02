@@ -104,18 +104,6 @@ public class PostServiceImpl implements PostService {
             throw new RuntimeException("Unable to update Post by user - " + postToUpdate.getUser().getUsername());
         }
 
-        if (newPost.getTitle() != null && !newPost.getTitle().isEmpty()) {
-            postToUpdate.setTitle(newPost.getTitle());
-        }
-        if (newPost.getDescription() != null && !newPost.getDescription().isEmpty()) {
-            postToUpdate.setDescription(newPost.getDescription());
-        }
-        if (newPost.getContent() != null && !newPost.getContent().isEmpty()) {
-            postToUpdate.setContent(newPost.getContent());
-        }
-        if (newPost.getTags() != null && !newPost.getTags().isEmpty()) {
-            postToUpdate.setTags(postMapper.mapTags(newPost.getTags()));
-        }
         postToUpdate.setUpdatedAt(LocalDateTime.now());
 
         Post updatedPost = postRepository.save(postToUpdate);

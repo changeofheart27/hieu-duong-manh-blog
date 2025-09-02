@@ -3,7 +3,9 @@ package vn.com.hieuduongmanhblog.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import vn.com.hieuduongmanhblog.dto.UserDTO;
+import vn.com.hieuduongmanhblog.exception.JwtAuthenticationEntryPoint;
 import vn.com.hieuduongmanhblog.exception.ResourceNotFoundException;
 import vn.com.hieuduongmanhblog.service.JwtUtilService;
 import vn.com.hieuduongmanhblog.service.UserService;
@@ -43,6 +45,9 @@ public class UserControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     private List<UserDTO> userDTOs;
 

@@ -64,11 +64,11 @@ public class Role {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Role role = (Role) o;
-        return Objects.equals(id, role.id) && roleName == role.roleName;
+        return Objects.equals(id, role.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, roleName);
+        return Objects.hashCode(id);
     }
 }
