@@ -1,6 +1,5 @@
 package vn.com.hieuduongmanhblog.config;
 
-import vn.com.hieuduongmanhblog.entity.User;
 import vn.com.hieuduongmanhblog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

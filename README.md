@@ -8,6 +8,7 @@ Welcome to **Hieu Duong Manh Blog**! This is a personal blog website created to 
 - **Database Integration**: Store blog posts, users, and other related data using **Spring Data JPA** with a relational database.
 - **RESTful API**: Expose a REST API for interacting with the blog data.
 - **JWT Authentication**: Secure the API with JSON Web Tokens (JWT).
+- **Swagger Documentation**: Easily explore and test the REST API using Swagger UI.
 
 ## Tech Stack
 
@@ -21,6 +22,7 @@ Welcome to **Hieu Duong Manh Blog**! This is a personal blog website created to 
 - **Spring AOP (Aspect-Oriented Programming)**: Used to manage cross-cutting concerns such as logging, security, and transaction management.
 - **JUnit 5**: A testing framework for writing and executing tests.
 - **Mockito**: A popular mocking framework used in conjunction with JUnit 5 to test components in isolation.
+- **Swagger / Springdoc OpenAPI**: For generating interactive API documentation.
 
 ## Installation
 
@@ -55,3 +57,7 @@ Welcome to **Hieu Duong Manh Blog**! This is a personal blog website created to 
 
 5. The application will be running locally on `http://localhost:8080`.
 
+## API Documentation (Swagger UI)
+Swagger UI is available to explore and test the API endpoints interactively. 
+After running the application, open your browser and go to:
+`http://localhost:8080/hieu-duong-manh-blog/swagger-ui/index.html`

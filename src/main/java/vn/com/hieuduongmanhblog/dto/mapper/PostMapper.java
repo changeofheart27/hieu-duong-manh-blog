@@ -48,15 +48,15 @@ public class PostMapper {
         return post;
     }
 
-    public String mapTags(List<Tag> tags) {
+    public String mapTags(Set<Tag> tags) {
         return tags
                 .stream()
                 .map(Tag::getTagName)
                 .collect(Collectors.joining(","));
     }
 
-    public List<Tag> mapTags(String tags) {
-        List<Tag> tagList = new ArrayList<>();
+    public Set<Tag> mapTags(String tags) {
+        Set<Tag> tagList = new HashSet<>();
         String[] tagNameArr = tags.split(",");
         for (String tagName : tagNameArr) {
             final String trimmedTagName = tagName.trim();

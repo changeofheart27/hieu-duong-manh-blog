@@ -105,7 +105,7 @@ CREATE TABLE `posts` (
   `id` int not null auto_increment,
   `title` varchar(100) not null,
   `description` varchar(200),
-  `content` varchar(1000),
+  `content` text,
   `created_at` datetime default (now()),
   `updated_at` datetime default null,
   `user_id` int,

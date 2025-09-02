@@ -1,8 +1,7 @@
 package vn.com.hieuduongmanhblog.filter;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import vn.com.hieuduongmanhblog.exception.JwtAuthenticationEntryPoint;
 import vn.com.hieuduongmanhblog.service.JwtUtilService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,17 +23,17 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtilService jwtService;
     private final UserDetailsService userDetailsService;
-    private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Autowired
     public JwtAuthenticationFilter(
             JwtUtilService jwtService,
             UserDetailsService userDetailsService,
-            @Qualifier("jwtAuthenticationEntryPoint") AuthenticationEntryPoint authenticationEntryPoint
+            JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint
     ) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
-        this.authenticationEntryPoint = authenticationEntryPoint;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     }
 
     @Override
@@ -65,7 +64,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         } catch (Exception exception) {
-            authenticationEntryPoint.commence(request, response,
+            jwtAuthenticationEntryPoint.commence(request, response,
                     new InsufficientAuthenticationException(exception.getMessage(), exception));
         }
     }

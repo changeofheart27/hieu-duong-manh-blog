@@ -1,7 +1,7 @@
 package vn.com.hieuduongmanhblog.service.impl;
 
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import vn.com.hieuduongmanhblog.dto.UserAuthenticationRequestDTO;
 import vn.com.hieuduongmanhblog.dto.UserRegistrationRequestDTO;
 import vn.com.hieuduongmanhblog.entity.Role;
@@ -45,6 +45,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
         this.authenticationManager = authenticationManager;
     }
 
+    @Override
     public String registerUser(UserRegistrationRequestDTO request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new UserAlreadyExistAuthenticationException("User with username " + request.getUsername() + " already exists!");
@@ -64,6 +65,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
         return jwtService.generateToken(newUser.getUsername());
     }
 
+    @Override
     public String authenticateUser(UserAuthenticationRequestDTO request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -71,7 +73,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
                         request.getPassword()
                 )
         );
-        User user = (User) authentication.getPrincipal();
-        return jwtService.generateToken(user.getUsername());
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return jwtService.generateToken(userDetails.getUsername());
     }
 }

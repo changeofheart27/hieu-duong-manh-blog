@@ -3,10 +3,12 @@ package vn.com.hieuduongmanhblog.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import vn.com.hieuduongmanhblog.dto.PostDTO;
 import vn.com.hieuduongmanhblog.entity.Role;
 import vn.com.hieuduongmanhblog.entity.RoleName;
 import vn.com.hieuduongmanhblog.entity.User;
+import vn.com.hieuduongmanhblog.exception.JwtAuthenticationEntryPoint;
 import vn.com.hieuduongmanhblog.exception.ResourceNotFoundException;
 import vn.com.hieuduongmanhblog.service.JwtUtilService;
 import vn.com.hieuduongmanhblog.service.PostService;
@@ -46,6 +48,9 @@ public class PostControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     private List<PostDTO> postDTOs;
 

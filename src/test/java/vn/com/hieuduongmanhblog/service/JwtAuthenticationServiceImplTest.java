@@ -8,10 +8,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import vn.com.hieuduongmanhblog.dto.UserAuthenticationRequestDTO;
 import vn.com.hieuduongmanhblog.dto.UserRegistrationRequestDTO;
@@ -117,12 +116,13 @@ public class JwtAuthenticationServiceImplTest {
                 authenticationRequestDTO.getUsername(),
                 authenticationRequestDTO.getPassword()
         );
-        // Spring Security: mock SecurityContext object and related entities
-        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+
         Authentication auth = Mockito.mock(Authentication.class);
+        User mockUser = new User();
+        mockUser.setUsername("hieudm");
 
         Mockito.when(authenticationManager.authenticate(newUser)).thenReturn(auth);
-        Mockito.when(auth.isAuthenticated()).thenReturn(true);
+        Mockito.when(auth.getPrincipal()).thenReturn(mockUser);
         Mockito.when(jwtUtilService.generateToken(authenticationRequestDTO.getUsername())).thenReturn(jwtToken);
 
         String actualJwtToken = jwtAuthenticationService.authenticateUser(authenticationRequestDTO);
@@ -137,24 +137,17 @@ public class JwtAuthenticationServiceImplTest {
     @DisplayName("Authenticate Not Existing User Should Throw Exception")
     void testAuthenticateUserFailed() {
         UserAuthenticationRequestDTO authenticationRequestDTO = new UserAuthenticationRequestDTO("newusername", "password123");
-        UsernamePasswordAuthenticationToken newUser = new UsernamePasswordAuthenticationToken(
-                authenticationRequestDTO.getUsername(),
-                authenticationRequestDTO.getPassword()
-        );
-        // Spring Security: mock SecurityContext object and related entities
-        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-        Authentication auth = Mockito.mock(Authentication.class);
 
-        Mockito.when(authenticationManager.authenticate(newUser)).thenReturn(auth);
-        Mockito.when(auth.isAuthenticated()).thenReturn(false);
+        Mockito.when(authenticationManager.authenticate(Mockito.any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new BadCredentialsException("Bad Credentials"));
 
         Assertions.assertThrows(
-                UsernameNotFoundException.class,
+                BadCredentialsException.class,
                 () -> jwtAuthenticationService.authenticateUser(authenticationRequestDTO),
                 "Should throw exception"
         );
 
-        Mockito.verify(authenticationManager, Mockito.times(1)).authenticate(newUser);
+        Mockito.verify(authenticationManager, Mockito.times(1)).authenticate(Mockito.any(UsernamePasswordAuthenticationToken.class));
     }
 
 }
