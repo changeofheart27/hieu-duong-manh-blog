@@ -111,7 +111,7 @@ public class PostServiceImplTest {
     @Test
     @DisplayName("Find Post By Id Should Return A Valid Post")
     void testFindPostByIdSuccess() {
-        PostDTO postDTO = new PostDTO(1, "Title 1", "Description 1", "Content 1", "Post Author");
+        PostDTO postDTO = new PostDTO(1, "Title 1", "Description 1", "Content 1", null, null, "Post Author", null);
         Mockito.when(postRepository.findById(1)).thenReturn(Optional.of(posts.get(0)));
         Mockito.when(postMapper.toPostDTO(ArgumentMatchers.any(Post.class))).thenReturn(postDTO);
 
@@ -162,7 +162,10 @@ public class PostServiceImplTest {
                     post.getTitle(),
                     post.getDescription(),
                     post.getContent(),
-                    post.getUser().getUsername()
+                    null,
+                    null,
+                    post.getUser().getUsername(),
+                    null
             );
         });
 
@@ -214,7 +217,7 @@ public class PostServiceImplTest {
                 "#java"
         );
 
-        Mockito.when(postMapper.toPost(postDTO)).thenReturn(postToCreate);
+        Mockito.when(postMapper.toPost(ArgumentMatchers.any(PostDTO.class))).thenReturn(postToCreate);
         // Spring Security: mock method invocations to get current user
         Mockito.when(securityContext.getAuthentication()).thenReturn(auth);
         SecurityContextHolder.setContext(securityContext);

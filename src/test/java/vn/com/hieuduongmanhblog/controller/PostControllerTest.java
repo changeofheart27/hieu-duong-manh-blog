@@ -59,8 +59,8 @@ public class PostControllerTest {
         // prepare data to test
         objectMapper = new ObjectMapper();
         User user = new User(1, "username", "password", LocalDate.of(1999, 7, 2), "username@email.com", LocalDateTime.now(), null, "avatar1.png", Set.of(new Role(1, RoleName.USER)));
-        PostDTO post1 = new PostDTO(1, "Title 1", "Description 1", "Content 1", user.getUsername());
-        PostDTO post2 = new PostDTO(2, "Title 2", "Description 2", "Content 2", user.getUsername());
+        PostDTO post1 = new PostDTO(1, "Title 1", "Description 1", "Content 1", null, null, user.getUsername(), null);
+        PostDTO post2 = new PostDTO(2, "Title 2", "Description 2", "Content 2", null, null, user.getUsername(), null);
         PostDTO post3 = new PostDTO(3, "Title 3", "Description 3", "Content 3", null);
         postDTOs = new ArrayList<>();
         postDTOs.add(post1);

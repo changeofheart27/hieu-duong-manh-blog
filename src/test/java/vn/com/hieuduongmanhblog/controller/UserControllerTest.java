@@ -174,10 +174,10 @@ public class UserControllerTest {
     @DisplayName("PUT OPERATION: Update Existing User Should Throw Exception")
     void testUpdateUserFailed() throws Exception {
         UserDTO invalidUserDTO = new UserDTO(
-                null,
+                0,
                 "username0",
                 LocalDate.of(2024, 6, 5),
-                "username0@email.com`",
+                "username0@email.com",
                 "USER_ROLE"
         );
 
