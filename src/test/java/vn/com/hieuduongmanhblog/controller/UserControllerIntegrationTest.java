@@ -151,14 +151,17 @@ public class UserControllerIntegrationTest {
     @Test
     @DisplayName("PUT OPERATION: Update Existing User Should Return Updated User")
     void testUpdateUserSuccess() throws Exception {
-        UserDTO updatedUserDTO = new UserDTO();
-        updatedUserDTO.setId(3);
-        updatedUserDTO.setDob(LocalDate.of(1999, 10, 20));
-        updatedUserDTO.setEmail("updatedemail@gmail.com");
+        UserDTO updatedUserDTO = new UserDTO(
+                3,
+                null,
+                LocalDate.of(1999, 10, 20),
+                "updatedemail@gmail.com",
+                null
+        );
 
         this.mockMvc.perform(
                         MockMvcRequestBuilders
-                                .put("/api/v1/users/{id}", updatedUserDTO.getId())
+                                .put("/api/v1/users/{id}", updatedUserDTO.id())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(updatedUserDTO))
                                 .header(HttpHeaders.AUTHORIZATION, this.jwtToken)
@@ -167,10 +170,10 @@ public class UserControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(200)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Update User Successful")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(updatedUserDTO.getId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(updatedUserDTO.id()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.username").value("phuongcaot"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.dob").value(updatedUserDTO.getDob().toString()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value(updatedUserDTO.getEmail()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.dob").value(updatedUserDTO.dob().toString()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value(updatedUserDTO.email()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.roles").value("USER"));
 
         this.mockMvc.perform(
@@ -185,14 +188,17 @@ public class UserControllerIntegrationTest {
     @Test
     @DisplayName("PUT OPERATION: Update Existing User Should Throw Exception")
     void testUpdateUserFailed() throws Exception {
-        UserDTO updatedUserDTO = new UserDTO();
-        updatedUserDTO.setId(10);
-        updatedUserDTO.setDob(LocalDate.of(1999, 10, 20));
-        updatedUserDTO.setEmail("updatedemail@gmail.com");
+        UserDTO updatedUserDTO = new UserDTO(
+                10,
+                null,
+                LocalDate.of(1999, 10, 20),
+                "updatedemail@gmail.com",
+                null
+        );
 
         this.mockMvc.perform(
                         MockMvcRequestBuilders
-                                .put("/api/v1/users/{id}", updatedUserDTO.getId())
+                                .put("/api/v1/users/{id}", updatedUserDTO.id())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(this.objectMapper.writeValueAsString(updatedUserDTO))
                                 .header(HttpHeaders.AUTHORIZATION, this.jwtToken)
@@ -200,7 +206,7 @@ public class UserControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(404)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Could not find User with id - " + updatedUserDTO.getId())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Could not find User with id - " + updatedUserDTO.id())));
     }
 
     @Test

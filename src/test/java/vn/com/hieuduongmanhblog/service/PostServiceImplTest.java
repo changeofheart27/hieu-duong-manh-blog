@@ -111,16 +111,16 @@ public class PostServiceImplTest {
     @Test
     @DisplayName("Find Post By Id Should Return A Valid Post")
     void testFindPostByIdSuccess() {
-        PostDTO postDTO = new PostDTO(1, "Title 1", "Description 1", "Content 1", "Post Author");
+        PostDTO postDTO = new PostDTO(1, "Title 1", "Description 1", "Content 1", null, null, "Post Author", null);
         Mockito.when(postRepository.findById(1)).thenReturn(Optional.of(posts.get(0)));
         Mockito.when(postMapper.toPostDTO(ArgumentMatchers.any(Post.class))).thenReturn(postDTO);
 
         PostDTO actualPostDTO = postServiceImpl.findPostById(1);
 
-        Assertions.assertEquals(this.posts.get(0).getId(), actualPostDTO.getId(), "Id should match each other");
-        Assertions.assertEquals(this.posts.get(0).getTitle(), actualPostDTO.getTitle(), "Title should match each other");
-        Assertions.assertEquals(this.posts.get(0).getDescription(), actualPostDTO.getDescription(), "Description should match each other");
-        Assertions.assertEquals(this.posts.get(0).getContent(), actualPostDTO.getContent(), "Content should match each other");
+        Assertions.assertEquals(this.posts.get(0).getId(), actualPostDTO.id(), "Id should match each other");
+        Assertions.assertEquals(this.posts.get(0).getTitle(), actualPostDTO.title(), "Title should match each other");
+        Assertions.assertEquals(this.posts.get(0).getDescription(), actualPostDTO.description(), "Description should match each other");
+        Assertions.assertEquals(this.posts.get(0).getContent(), actualPostDTO.content(), "Content should match each other");
 
         Mockito.verify(this.postRepository, Mockito.times(1)).findById(1);
         Mockito.verify(this.postMapper, Mockito.times(1)).toPostDTO(ArgumentMatchers.any(Post.class));
@@ -162,7 +162,10 @@ public class PostServiceImplTest {
                     post.getTitle(),
                     post.getDescription(),
                     post.getContent(),
-                    post.getUser().getUsername()
+                    null,
+                    null,
+                    post.getUser().getUsername(),
+                    null
             );
         });
 
@@ -171,7 +174,7 @@ public class PostServiceImplTest {
 
         Assertions.assertNotNull(actualPostDTOs);
         Assertions.assertEquals(this.posts.size(), actualPostDTOs.getContent().size(), "Size should be 2");
-        Assertions.assertEquals("username", actualPostDTOs.getContent().get(0).getPostAuthor(), "Username should match each other");
+        Assertions.assertEquals("username", actualPostDTOs.getContent().get(0).postAuthor(), "Username should match each other");
 
         Mockito.verify(this.postRepository, Mockito.times(1)).findByUser_Username(ArgumentMatchers.eq("username"), ArgumentMatchers.any(PageRequest.class));
         Mockito.verify(this.postMapper, Mockito.times(2)).toPostDTO(ArgumentMatchers.any(Post.class));
@@ -206,12 +209,15 @@ public class PostServiceImplTest {
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         Authentication auth = Mockito.mock(Authentication.class);
         UserDetails userDetails = Mockito.mock(UserDetails.class);
-        PostDTO postDTO = new PostDTO();
-        postDTO.setTitle("New Post Title 1");
-        postDTO.setDescription("New Post Description 1");
-        postDTO.setContent("New Post Content 1");
+        PostDTO postDTO = new PostDTO(
+                null,
+                "New Post Title 1",
+                "New Post Description 1",
+                "New Post Content 1",
+                "#java"
+        );
 
-        Mockito.when(postMapper.toPost(postDTO)).thenReturn(postToCreate);
+        Mockito.when(postMapper.toPost(ArgumentMatchers.any(PostDTO.class))).thenReturn(postToCreate);
         // Spring Security: mock method invocations to get current user
         Mockito.when(securityContext.getAuthentication()).thenReturn(auth);
         SecurityContextHolder.setContext(securityContext);
@@ -223,10 +229,10 @@ public class PostServiceImplTest {
 
         PostDTO actualPostDTO = postServiceImpl.createPost(postDTO);
 
-        Assertions.assertEquals(actualPostDTO.getId(), postDTO.getId(), "Id should match each other");
-        Assertions.assertEquals(actualPostDTO.getTitle(), postDTO.getTitle(), "Title should match each other");
-        Assertions.assertEquals(actualPostDTO.getDescription(), postDTO.getDescription(), "Description should match each other");
-        Assertions.assertEquals(actualPostDTO.getContent(), postDTO.getContent(), "Content should match each other");
+        Assertions.assertEquals(actualPostDTO.id(), postDTO.id(), "Id should match each other");
+        Assertions.assertEquals(actualPostDTO.title(), postDTO.title(), "Title should match each other");
+        Assertions.assertEquals(actualPostDTO.description(), postDTO.description(), "Description should match each other");
+        Assertions.assertEquals(actualPostDTO.content(), postDTO.content(), "Content should match each other");
 
         Mockito.verify(this.postRepository, Mockito.times(1)).save(ArgumentMatchers.any(Post.class));
         Mockito.verify(this.postMapper, Mockito.times(1)).toPost(ArgumentMatchers.any(PostDTO.class));
@@ -240,10 +246,13 @@ public class PostServiceImplTest {
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         Authentication auth = Mockito.mock(Authentication.class);
         UserDetails userDetails = Mockito.mock(UserDetails.class);
-        PostDTO postDTO = new PostDTO();
-        postDTO.setTitle("Updated Post Title 1");
-        postDTO.setDescription("Updated Post Description 1");
-        postDTO.setContent("Updated Post Content 1");
+        PostDTO postDTO = new PostDTO(
+                null,
+                "Updated Post Title 1",
+                "Updated Post Description 1",
+                "Updated Post Content 1",
+                "#java"
+        );
 
         Mockito.when(postRepository.findById(1)).thenReturn(Optional.of(postToUpdate));
         // Spring Security: mock method invocations to get current user
@@ -256,10 +265,10 @@ public class PostServiceImplTest {
 
         PostDTO actualPostDTO = postServiceImpl.updatePostById(1, postDTO);
 
-        Assertions.assertEquals(actualPostDTO.getId(), postDTO.getId(), "Id should match each other");
-        Assertions.assertEquals(actualPostDTO.getTitle(), postDTO.getTitle(), "Title should match each other");
-        Assertions.assertEquals(actualPostDTO.getDescription(), postDTO.getDescription(), "Description should match each other");
-        Assertions.assertEquals(actualPostDTO.getContent(), postDTO.getContent(), "Content should match each other");
+        Assertions.assertEquals(actualPostDTO.id(), postDTO.id(), "Id should match each other");
+        Assertions.assertEquals(actualPostDTO.title(), postDTO.title(), "Title should match each other");
+        Assertions.assertEquals(actualPostDTO.description(), postDTO.description(), "Description should match each other");
+        Assertions.assertEquals(actualPostDTO.content(), postDTO.content(), "Content should match each other");
 
         Mockito.verify(this.postRepository, Mockito.times(1)).save(postToUpdate);
         Mockito.verify(this.postMapper, Mockito.times(1)).toPostDTO(postToUpdate);
@@ -272,10 +281,13 @@ public class PostServiceImplTest {
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         Authentication auth = Mockito.mock(Authentication.class);
         UserDetails userDetails = Mockito.mock(UserDetails.class);
-        PostDTO postDTO = new PostDTO();
-        postDTO.setTitle("Updated Post Title 1");
-        postDTO.setDescription("Updated Post Description 1");
-        postDTO.setContent("Updated Post Content 1");
+        PostDTO postDTO = new PostDTO(
+                null,
+                "Updated Post Title 1",
+                "Updated Post Description 1",
+                "Updated Post Content 1",
+                "#java"
+        );
 
         Mockito.when(postRepository.findById(1)).thenReturn(Optional.of(postToUpdate));
         // Spring Security: mock method invocations to get current user

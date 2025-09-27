@@ -77,8 +77,8 @@ public class PostServiceImpl implements PostService {
     public PostDTO createPost(PostDTO newPost) {
         // setting id to 0 to avoid passing new post with existing id inside database
         // and a save of new item instead of updating current one
-        newPost.setId(0);
-        Post postToCreate = postMapper.toPost(newPost);
+        PostDTO postDTOWithZeroId = newPost.PostDTOWithDefaultId(0);
+        Post postToCreate = postMapper.toPost(postDTOWithZeroId);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDetails currentUserInfo = (UserDetails) auth.getPrincipal();
         User user = userRepository
@@ -104,7 +104,7 @@ public class PostServiceImpl implements PostService {
             throw new RuntimeException("Unable to update Post by user - " + postToUpdate.getUser().getUsername());
         }
 
-        postToUpdate.setUpdatedAt(LocalDateTime.now());
+        postMapper.updatePostFromDTO(newPost, postToUpdate);
 
         Post updatedPost = postRepository.save(postToUpdate);
         return postMapper.toPostDTO(updatedPost);

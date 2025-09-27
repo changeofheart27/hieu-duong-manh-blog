@@ -147,12 +147,13 @@ public class PostControllerIntegrationTest {
     @DisplayName("POST OPERATION: Create A New Post")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void testCreateNewPost() throws Exception {
-        PostDTO createdPostDTO = new PostDTO();
-        createdPostDTO.setId(6);
-        createdPostDTO.setTitle("Demo New Post Title 6");
-        createdPostDTO.setDescription("Demo New Post Description 6");
-        createdPostDTO.setContent("Demo New Post Content 6");
-        createdPostDTO.setTags("#java");
+        PostDTO createdPostDTO = new PostDTO(
+                6,
+                "Demo New Post Title 6",
+                "Demo New Post Description 6",
+                "Demo New Post Content 6",
+                "#java"
+        );
 
         this.mockMvc.perform(
                         MockMvcRequestBuilders
@@ -165,12 +166,12 @@ public class PostControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(201)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Create New Post Successful")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(createdPostDTO.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value(createdPostDTO.getTitle()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.description").value(createdPostDTO.getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value(createdPostDTO.getContent()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(createdPostDTO.id()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value(createdPostDTO.title()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.description").value(createdPostDTO.description()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value(createdPostDTO.content()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.postAuthor").value("hieuduongm"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.tags").value(createdPostDTO.getTags()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.tags").value(createdPostDTO.tags()));
 
         this.mockMvc.perform(
                 MockMvcRequestBuilders
@@ -184,16 +185,17 @@ public class PostControllerIntegrationTest {
     @Test
     @DisplayName("PUT OPERATION: Update Existing Post Should Return Updated Post")
     void testUpdatePostSuccess() throws Exception {
-        PostDTO updatedPostDTO = new PostDTO();
-        updatedPostDTO.setId(3);
-        updatedPostDTO.setTitle("Demo Edited Post Title 3");
-        updatedPostDTO.setDescription("Demo Edited Post Description 3");
-        updatedPostDTO.setContent("Demo Edited Post Content 3");
-        updatedPostDTO.setTags("#java");
+        PostDTO updatedPostDTO = new PostDTO(
+                3,
+                "Demo Edited Post Title 3",
+                "Demo Edited Post Description 3",
+                "Demo Edited Post Content 3",
+                "#java"
+        );
 
         this.mockMvc.perform(
                 MockMvcRequestBuilders
-                        .put("/api/v1/posts/{id}", updatedPostDTO.getId())
+                        .put("/api/v1/posts/{id}", updatedPostDTO.id())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedPostDTO))
                         .header(HttpHeaders.AUTHORIZATION, this.jwtToken)
@@ -202,16 +204,16 @@ public class PostControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status", Matchers.is(200)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.is("Update Post Successful")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(updatedPostDTO.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value(updatedPostDTO.getTitle()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.description").value(updatedPostDTO.getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value(updatedPostDTO.getContent()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(updatedPostDTO.id()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value(updatedPostDTO.title()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.description").value(updatedPostDTO.description()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value(updatedPostDTO.content()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.postAuthor").value("hieuduongm"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.tags").value(updatedPostDTO.getTags()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.tags").value(updatedPostDTO.tags()));
 
         this.mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/api/v1/posts/{id}", updatedPostDTO.getId())
+                        .get("/api/v1/posts/{id}", updatedPostDTO.id())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, this.jwtToken)
                 )
@@ -221,11 +223,13 @@ public class PostControllerIntegrationTest {
     @Test
     @DisplayName("PUT OPERATION: Update Existing Post Should Throw Exception")
     void testUpdatePostFailed() throws Exception {
-        PostDTO updatedPostDTO = new PostDTO();
-        updatedPostDTO.setTitle("Demo Edited Post Title 10");
-        updatedPostDTO.setDescription("Demo Edited Post Description 10");
-        updatedPostDTO.setContent("Demo Edited Post Content 10");
-        updatedPostDTO.setTags("#java");
+        PostDTO updatedPostDTO = new PostDTO(
+                null,
+                "Demo Edited Post Title 10",
+                "Demo Edited Post Description 10",
+                "Demo Edited Post Content 10",
+                "#java"
+        );
 
         this.mockMvc.perform(
                 MockMvcRequestBuilders

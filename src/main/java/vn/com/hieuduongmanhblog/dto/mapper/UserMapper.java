@@ -12,7 +12,6 @@ import vn.com.hieuduongmanhblog.repository.RoleRepository;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,7 +28,7 @@ public class UserMapper {
     }
 
     public UserDTO toUserDTO(User user) {
-        String avatarUrl = user.getAvatar() != null ? this.avatarUrlBase + user.getAvatar() : null;
+        String avatarUrl = user.getAvatar() != null ? this.avatarUrlBase.trim() + user.getAvatar() : null;
         return new UserDTO(
                 user.getId(),
                 user.getUsername(),
@@ -46,14 +45,24 @@ public class UserMapper {
     public User toUserEntity(UserDTO userDTO) {
         User user = new User();
         user.setUsername(user.getUsername());
-        user.setDob(userDTO.getDob());
-        user.setEmail(userDTO.getEmail());
-        user.setCreatedAt(userDTO.getCreatedAt());
+        user.setDob(userDTO.dob());
+        user.setEmail(userDTO.email());
+        user.setCreatedAt(userDTO.createdAt());
         user.setUpdatedAt(LocalDateTime.now());
-        user.setAvatar(userDTO.getAvatar());
-        user.setRoles(mapRoles(userDTO.getRoles()));
+        user.setAvatar(userDTO.avatar());
+        user.setRoles(mapRoles(userDTO.roles()));
 
         return user;
+    }
+
+    public void updateUserFromDTO(UserDTO userDTO, User existingUser) {
+        if (userDTO.dob() != null && !userDTO.dob().toString().isEmpty()) {
+            existingUser.setDob(userDTO.dob());
+        }
+        if (userDTO.email() != null && !userDTO.email().isEmpty()) {
+            existingUser.setEmail(userDTO.email());
+        }
+        existingUser.setUpdatedAt(LocalDateTime.now());
     }
 
     public String mapRoles(Set<Role> roles) {

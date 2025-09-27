@@ -8,125 +8,41 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class UserDTO {
-    private Integer id;
+public record UserDTO(
+    Integer id,
 
-    private String username;
+    String username,
 
     @NotNull(message = "dob cannot be null")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dob;
+    LocalDate dob,
 
     @NotNull(message = "email cannot be null")
     @Pattern(regexp = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$", message = "email is not valid")
-    private String email;
+    String email,
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createdAt;
+    LocalDateTime createdAt,
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime updatedAt;
+    LocalDateTime updatedAt,
 
-    private String avatar;
+    String avatar,
 
-    private String avatarUrl;
+    String avatarUrl,
 
-    private String roles;
-
-    public UserDTO() {
-
-    }
-
+    String roles
+) {
     public UserDTO(Integer id, String username, LocalDate dob, String email, String roles) {
-        this.id = id;
-        this.username = username;
-        this.dob = dob;
-        this.email = email;
-        this.roles = roles;
+        this(id, username, dob, email, null, null, null, null, roles);
     }
 
-    public UserDTO(Integer id, String username, LocalDate dob, String email, LocalDateTime createdAt, LocalDateTime updatedAt, String avatar, String avatarUrl, String roles) {
-        this.id = id;
-        this.username = username;
-        this.dob = dob;
-        this.email = email;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.avatar = avatar;
-        this.avatarUrl = avatarUrl;
-        this.roles = roles;
+    public UserDTO UserDTOWithDefaultId(Integer newId) {
+        return new UserDTO(newId, username, dob, email, createdAt, updatedAt, avatar, avatarUrl, roles);
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public LocalDate getDob() {
-        return dob;
-    }
-
-    public void setDob(LocalDate dob) {
-        this.dob = dob;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
-
-    public String getRoles() {
-        return roles;
-    }
-
-    public void setRoles(String roles) {
-        this.roles = roles;
+    public UserDTO UserDTOWithAvatarUrl(String newAvatarUrl) {
+        return new UserDTO(id, username, dob, email, createdAt, updatedAt, avatar, newAvatarUrl, roles);
     }
 }
