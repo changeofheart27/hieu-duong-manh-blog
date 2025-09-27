@@ -108,10 +108,10 @@ public class UserServiceImplTest {
 
         UserDTO actualUserDTO = userServiceImpl.findUserById(1);
 
-        Assertions.assertEquals(1, actualUserDTO.getId(), "Id should match each other");
-        Assertions.assertEquals(this.users.get(0).getUsername(), actualUserDTO.getUsername(), "Username should match each other");
-        Assertions.assertEquals(this.users.get(0).getDob(), actualUserDTO.getDob(), "Dob should match each other");
-        Assertions.assertEquals(this.users.get(0).getEmail(), actualUserDTO.getEmail(), "Email should match each other");
+        Assertions.assertEquals(1, actualUserDTO.id(), "Id should match each other");
+        Assertions.assertEquals(this.users.get(0).getUsername(), actualUserDTO.username(), "Username should match each other");
+        Assertions.assertEquals(this.users.get(0).getDob(), actualUserDTO.dob(), "Dob should match each other");
+        Assertions.assertEquals(this.users.get(0).getEmail(), actualUserDTO.email(), "Email should match each other");
 
         Mockito.verify(this.userRepository, Mockito.times(1)).findById(1);
         Mockito.verify(this.userMapper, Mockito.times(1)).toUserDTO(ArgumentMatchers.any(User.class));
@@ -141,10 +141,10 @@ public class UserServiceImplTest {
 
         UserDTO actualUserDTO = userServiceImpl.findUserByUsername("username2");
 
-        Assertions.assertEquals(this.users.get(1).getId(), actualUserDTO.getId(), "Id should match each other");
-        Assertions.assertEquals(this.users.get(1).getUsername(), actualUserDTO.getUsername(), "Username should match each other");
-        Assertions.assertEquals(this.users.get(1).getDob(), actualUserDTO.getDob(), "Dob should match each other");
-        Assertions.assertEquals(this.users.get(1).getEmail(), actualUserDTO.getEmail(), "Email should match each other");
+        Assertions.assertEquals(this.users.get(1).getId(), actualUserDTO.id(), "Id should match each other");
+        Assertions.assertEquals(this.users.get(1).getUsername(), actualUserDTO.username(), "Username should match each other");
+        Assertions.assertEquals(this.users.get(1).getDob(), actualUserDTO.dob(), "Dob should match each other");
+        Assertions.assertEquals(this.users.get(1).getEmail(), actualUserDTO.email(), "Email should match each other");
 
         Mockito.verify(this.userRepository, Mockito.times(1)).findByUsername("username2");
         Mockito.verify(this.userMapper, Mockito.times(1)).toUserDTO(ArgumentMatchers.any(User.class));
@@ -172,9 +172,13 @@ public class UserServiceImplTest {
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         Authentication auth = Mockito.mock(Authentication.class);
         UserDetails userDetails = Mockito.mock(UserDetails.class);
-        UserDTO userDTO = new UserDTO();
-        userDTO.setDob(LocalDate.of(1999, 7, 2));
-        userDTO.setEmail("newusername1@gmail.com");
+        UserDTO userDTO = new UserDTO(
+                null,
+                null,
+                LocalDate.of(1999, 7, 2),
+                "newusername1@gmail.com",
+                null
+        );
 
         Mockito.when(userRepository.findById(1)).thenReturn(Optional.of(this.users.get(0)));
         // Spring Security: mock method invocations to get current user
@@ -187,11 +191,11 @@ public class UserServiceImplTest {
 
         UserDTO actualUserDTO = userServiceImpl.updateUserById(1, userDTO);
 
-        Assertions.assertEquals(actualUserDTO.getId(), userDTO.getId(), "Id should match each other");
-        Assertions.assertEquals(actualUserDTO.getUsername(), userDTO.getUsername(), "Username should match each other");
-        Assertions.assertEquals(actualUserDTO.getDob(), userDTO.getDob(), "Dob should match each other");
-        Assertions.assertEquals(actualUserDTO.getEmail(), userDTO.getEmail(), "Email should match each other");
-        Assertions.assertEquals(actualUserDTO.getRoles(), userDTO.getRoles(), "Roles should match each other");
+        Assertions.assertEquals(actualUserDTO.id(), userDTO.id(), "Id should match each other");
+        Assertions.assertEquals(actualUserDTO.username(), userDTO.username(), "Username should match each other");
+        Assertions.assertEquals(actualUserDTO.dob(), userDTO.dob(), "Dob should match each other");
+        Assertions.assertEquals(actualUserDTO.email(), userDTO.email(), "Email should match each other");
+        Assertions.assertEquals(actualUserDTO.roles(), userDTO.roles(), "Roles should match each other");
 
         Mockito.verify(this.userRepository, Mockito.times(1)).save(this.users.get(0));
         Mockito.verify(this.userMapper, Mockito.times(1)).toUserDTO(this.users.get(0));
@@ -204,9 +208,13 @@ public class UserServiceImplTest {
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         Authentication auth = Mockito.mock(Authentication.class);
         UserDetails userDetails = Mockito.mock(UserDetails.class);
-        UserDTO userDTO = new UserDTO();
-        userDTO.setDob(LocalDate.of(1999, 7, 2));
-        userDTO.setEmail("newusername1@gmail.com");
+        UserDTO userDTO = new UserDTO(
+                null,
+                null,
+                LocalDate.of(1999, 7, 2),
+                "newusername1@gmail.com",
+                null
+        );
 
         Mockito.when(userRepository.findById(1)).thenReturn(Optional.of(this.users.get(0)));
         // Spring Security: mock method invocations to get current user

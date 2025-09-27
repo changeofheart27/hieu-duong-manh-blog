@@ -47,14 +47,14 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public String registerUser(UserRegistrationRequestDTO request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new UserAlreadyExistAuthenticationException("User with username " + request.getUsername() + " already exists!");
+        if (userRepository.existsByUsername(request.username())) {
+            throw new UserAlreadyExistAuthenticationException("User with username " + request.username() + " already exists!");
         }
 
         User newUser = new User(
-                request.getUsername(),
-                passwordEncoder.encode(request.getPassword()),
-                request.getEmail(),
+                request.username(),
+                passwordEncoder.encode(request.password()),
+                request.email(),
                 LocalDateTime.now()
         );
         Role defaultUserRole = roleRepository.findByRoleName(RoleName.USER)
@@ -69,8 +69,8 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
     public String authenticateUser(UserAuthenticationRequestDTO request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
+                        request.username(),
+                        request.password()
                 )
         );
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();

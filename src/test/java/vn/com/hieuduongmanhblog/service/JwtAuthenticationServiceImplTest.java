@@ -66,17 +66,17 @@ public class JwtAuthenticationServiceImplTest {
         UserRegistrationRequestDTO registrationRequestDTO =
                 new UserRegistrationRequestDTO("username123", "password123", "username@email.com", LocalDateTime.now());
         User createdUser = new User(
-                registrationRequestDTO.getUsername(),
-                registrationRequestDTO.getPassword(),
-                registrationRequestDTO.getEmail(),
-                registrationRequestDTO.getCreatedAt()
+                registrationRequestDTO.username(),
+                registrationRequestDTO.password(),
+                registrationRequestDTO.email(),
+                registrationRequestDTO.createdAt()
         );
 
         // mock the repository behavior
         Mockito.when(userRepository.existsByUsername("username123")).thenReturn(false);
         Mockito.when(userRepository.save(ArgumentMatchers.any(User.class))).thenReturn(createdUser);
         Mockito.when(roleRepository.findByRoleName(RoleName.USER)).thenReturn(Optional.of(userRole));
-        Mockito.when(jwtUtilService.generateToken(registrationRequestDTO.getUsername())).thenReturn(jwtToken);
+        Mockito.when(jwtUtilService.generateToken(registrationRequestDTO.username())).thenReturn(jwtToken);
 
         // call the service method
         String actualJwtToken = jwtAuthenticationService.registerUser(registrationRequestDTO);
@@ -94,8 +94,8 @@ public class JwtAuthenticationServiceImplTest {
         UserRegistrationRequestDTO registrationRequestDTO =
                 new UserRegistrationRequestDTO("hieudm", "test@123", "hieudm@email.com", LocalDateTime.now());
 
-        Mockito.when(userRepository.existsByUsername(registrationRequestDTO.getUsername())).thenThrow(
-                new UserAlreadyExistAuthenticationException("User with username " + registrationRequestDTO.getUsername() + " already exists!")
+        Mockito.when(userRepository.existsByUsername(registrationRequestDTO.username())).thenThrow(
+                new UserAlreadyExistAuthenticationException("User with username " + registrationRequestDTO.username() + " already exists!")
         );
 
         Assertions.assertThrows(
@@ -113,8 +113,8 @@ public class JwtAuthenticationServiceImplTest {
     void testAuthenticateUserSuccess() {
         UserAuthenticationRequestDTO authenticationRequestDTO = new UserAuthenticationRequestDTO("hieudm", "test@123");
         UsernamePasswordAuthenticationToken newUser = new UsernamePasswordAuthenticationToken(
-                authenticationRequestDTO.getUsername(),
-                authenticationRequestDTO.getPassword()
+                authenticationRequestDTO.username(),
+                authenticationRequestDTO.password()
         );
 
         Authentication auth = Mockito.mock(Authentication.class);
@@ -123,7 +123,7 @@ public class JwtAuthenticationServiceImplTest {
 
         Mockito.when(authenticationManager.authenticate(newUser)).thenReturn(auth);
         Mockito.when(auth.getPrincipal()).thenReturn(mockUser);
-        Mockito.when(jwtUtilService.generateToken(authenticationRequestDTO.getUsername())).thenReturn(jwtToken);
+        Mockito.when(jwtUtilService.generateToken(authenticationRequestDTO.username())).thenReturn(jwtToken);
 
         String actualJwtToken = jwtAuthenticationService.authenticateUser(authenticationRequestDTO);
 

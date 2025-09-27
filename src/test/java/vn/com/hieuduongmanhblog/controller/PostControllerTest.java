@@ -184,17 +184,19 @@ public class PostControllerTest {
     @Test
     @DisplayName("POST OPERATION: Create A New Post")
     void testCreateNewPost() throws Exception {
-        PostDTO createdPostDTO = new PostDTO();
-        createdPostDTO.setId(1);
-        createdPostDTO.setTitle("New Post Title 1");
-        createdPostDTO.setDescription("New Post Description 1");
-        createdPostDTO.setContent("New Post Content 1");
-        createdPostDTO.setPostAuthor("username");
-        createdPostDTO.setTags("#java");
+        PostDTO createdPostDTO = new PostDTO(
+                1,
+                "New Post Title 1",
+                "New Post Description 1",
+                "New Post Content 1",
+                null,
+                null,
+                "username",
+                "#java"
+        );
 
         // The mock call MUST use any instead of a concrete object
         Mockito.when(postService.createPost(ArgumentMatchers.any(PostDTO.class))).thenReturn(createdPostDTO);
-
 
         this.mockMvc.perform(
                 MockMvcRequestBuilders
@@ -206,11 +208,11 @@ public class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(201))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Create New Post Successful"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(createdPostDTO.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value(createdPostDTO.getTitle()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.description").value(createdPostDTO.getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value(createdPostDTO.getContent()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postAuthor").value(createdPostDTO.getPostAuthor()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(createdPostDTO.id()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value(createdPostDTO.title()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.description").value(createdPostDTO.description()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value(createdPostDTO.content()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postAuthor").value(createdPostDTO.postAuthor()));
 
         Mockito.verify(postService, Mockito.times(1)).createPost(ArgumentMatchers.any(PostDTO.class));
     }
@@ -218,13 +220,16 @@ public class PostControllerTest {
     @Test
     @DisplayName("PUT OPERATION: Update Existing Post Should Return Updated Post")
     void testUpdatePostSuccess() throws Exception {
-        PostDTO updatedPostDTO = new PostDTO();
-        updatedPostDTO.setId(1);
-        updatedPostDTO.setTitle("Updated Post Title 1");
-        updatedPostDTO.setDescription("Updated Post Description 1");
-        updatedPostDTO.setContent("Updated Post Content 1");
-        updatedPostDTO.setPostAuthor("username");
-        updatedPostDTO.setTags("#java");
+        PostDTO updatedPostDTO = new PostDTO(
+                1,
+                "Updated Post Title 1",
+                "Updated Post Description 1",
+                "Updated Post Content 1",
+                null,
+                null,
+                "username",
+                "#java"
+        );
 
         // The mock call MUST use any instead of a concrete object
         Mockito.when(postService.updatePostById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(PostDTO.class))).thenReturn(updatedPostDTO);
@@ -239,11 +244,11 @@ public class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Update Post Successful"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(updatedPostDTO.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value(updatedPostDTO.getTitle()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.description").value(updatedPostDTO.getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value(updatedPostDTO.getContent()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postAuthor").value(updatedPostDTO.getPostAuthor()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(updatedPostDTO.id()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value(updatedPostDTO.title()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.description").value(updatedPostDTO.description()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value(updatedPostDTO.content()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postAuthor").value(updatedPostDTO.postAuthor()));
 
         Mockito.verify(postService, Mockito.times(1)).updatePostById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(PostDTO.class));
     }
@@ -251,13 +256,16 @@ public class PostControllerTest {
     @Test
     @DisplayName("PUT OPERATION: Update Existing Post Should Throw Exception")
     void testUpdatePostFailed() throws Exception {
-        PostDTO updatedPostDTO = new PostDTO();
-        updatedPostDTO.setId(1);
-        updatedPostDTO.setTitle("Updated Post Title 1");
-        updatedPostDTO.setDescription("Updated Post Description 1");
-        updatedPostDTO.setContent("Updated Post Content 1");
-        updatedPostDTO.setPostAuthor("username");
-        updatedPostDTO.setTags("#java");
+        PostDTO updatedPostDTO = new PostDTO(
+                1,
+                "Updated Post Title 1",
+                "Updated Post Description 1",
+                "Updated Post Content 1",
+                null,
+                null,
+                "username",
+                "#java"
+        );
 
         // The mock call MUST use any instead of a concrete object
         Mockito.when(postService.updatePostById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(PostDTO.class)))

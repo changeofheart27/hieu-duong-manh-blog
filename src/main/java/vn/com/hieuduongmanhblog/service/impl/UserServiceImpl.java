@@ -122,7 +122,7 @@ public class UserServiceImpl implements UserService {
         }
         // upload image
         String avatarName = this.imageService.uploadImage(multipartFile);
-        String avatarUrl = this.avatarUrlBase + avatarName;
+        String avatarUrl = this.avatarUrlBase.trim() + avatarName;
 
         // update user with new avatarName
         userToUpdate.setAvatar(avatarName);
@@ -130,7 +130,7 @@ public class UserServiceImpl implements UserService {
         User updatedUser = this.userRepository.save(userToUpdate);
 
         UserDTO userDTO = this.userMapper.toUserDTO(updatedUser);
-        userDTO.setAvatarUrl(avatarUrl);
+        userDTO = userDTO.UserDTOWithAvatarUrl(avatarUrl);
 
         return userDTO;
     }

@@ -142,7 +142,13 @@ public class UserControllerTest {
     @Test
     @DisplayName("PUT OPERATION: Update Existing User Should Return Updated User")
     void testUpdateUserSuccess() throws Exception {
-        UserDTO updatedUserDTO = new UserDTO(4, "username4", LocalDate.of(1999, 2, 7), "updatedusername4@email.com", "ROLE_USER");
+        UserDTO updatedUserDTO = new UserDTO(
+                4,
+                "username4",
+                LocalDate.of(1999, 2, 7),
+                "updatedusername4@email.com",
+                "ROLE_USER"
+        );
 
         // The mock call MUST use any instead of a concrete object
         Mockito.when(userService.updateUserById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(UserDTO.class))).thenReturn(updatedUserDTO);
@@ -156,10 +162,10 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(4))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.username").value(updatedUserDTO.getUsername()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.dob").value(updatedUserDTO.getDob().toString()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value(updatedUserDTO.getEmail()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.roles").value(updatedUserDTO.getRoles()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.username").value(updatedUserDTO.username()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.dob").value(updatedUserDTO.dob().toString()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value(updatedUserDTO.email()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.roles").value(updatedUserDTO.roles()));
 
         Mockito.verify(userService, Mockito.times(1)).updateUserById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(UserDTO.class));
     }
@@ -167,12 +173,13 @@ public class UserControllerTest {
     @Test
     @DisplayName("PUT OPERATION: Update Existing User Should Throw Exception")
     void testUpdateUserFailed() throws Exception {
-        UserDTO invalidUserDTO = new UserDTO();
-        invalidUserDTO.setUsername("username0");
-        invalidUserDTO.setDob(LocalDate.of(2024, 6, 5));
-        invalidUserDTO.setEmail("username0@email.com");
-        invalidUserDTO.setCreatedAt(LocalDateTime.now());
-        invalidUserDTO.setRoles("USER_ROLE");
+        UserDTO invalidUserDTO = new UserDTO(
+                null,
+                "username0",
+                LocalDate.of(2024, 6, 5),
+                "username0@email.com`",
+                "USER_ROLE"
+        );
 
         // The mock call MUST use any instead of a concrete object
         Mockito.when(userService.updateUserById(ArgumentMatchers.anyInt(), ArgumentMatchers.any(UserDTO.class)))
