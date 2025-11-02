@@ -1,6 +1,7 @@
 package vn.com.hieuduongmanhblog.dto.mapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import vn.com.hieuduongmanhblog.dto.PostDTO;
 import vn.com.hieuduongmanhblog.entity.Post;
 import org.springframework.stereotype.Service;
@@ -8,11 +9,21 @@ import vn.com.hieuduongmanhblog.entity.Tag;
 import vn.com.hieuduongmanhblog.repository.TagRepository;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Service
+/**
+ * Mapper class for converting between Post entities and PostDTOs.
+ * <p>
+ * Handles transformations in both directions: entity → DTO and DTO → entity.
+ * Also provides methods to update existing Post entities from DTOs.
+ * Tag mapping is handled here, including converting tags to strings and
+ * fetching existing Tag entities from the database.
+ */
+@Component
 public class PostMapper {
     private final TagRepository tagRepository;
 
@@ -72,14 +83,19 @@ public class PostMapper {
     }
 
     public Set<Tag> mapTags(String tags) {
-        Set<Tag> tagList = new HashSet<>();
-        String[] tagNameArr = tags.split(",");
-        for (String tagName : tagNameArr) {
-            final String trimmedTagName = tagName.trim();
-            Tag tag = tagRepository.findByTagName(trimmedTagName)
-                    .orElseGet(() -> tagRepository.save(new Tag(trimmedTagName)));
-            tagList.add(tag);
-        }
-        return tagList;
+        Set<Tag> tagSet = new HashSet<>();
+        if (tags == null || tags.isEmpty()) return tagSet;
+
+        // Split, trim, and filter out empty tag names
+        Set<String> tagNames = Arrays.stream(tags.split(","))
+                .map(String::trim)
+                .filter(tag -> !tag.isEmpty())
+                .collect(Collectors.toSet());
+
+        // Fetch only existing tags, new tags will be ignored
+        List<Tag> existingTags = tagRepository.findAllByTagNameIn(tagNames);
+        tagSet.addAll(existingTags);
+
+        return tagSet;
     }
 }
