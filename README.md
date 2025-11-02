@@ -4,7 +4,8 @@ Welcome to **Hieu Duong Manh Blog**! This is a personal blog website created to 
 ## Features
 
 - **Post Management**: Perform CRUD operations (Create, Read, Update, Delete) on blog posts.
-- **User Management**: Manage user registration, login, and authentication.
+- **User Management**: Perform CRUD operations on users including registration and authentication.
+- **Image Storage**: Store and manage user avatars, blog post images (upload, retrieve, and serve from a dedicated storage mechanism).
 - **Database Integration**: Store blog posts, users, and other related data using **Spring Data JPA** with a relational database.
 - **RESTful API**: Expose a REST API for interacting with the blog data.
 - **JWT Authentication**: Secure the API with JSON Web Tokens (JWT).
@@ -17,8 +18,8 @@ Welcome to **Hieu Duong Manh Blog**! This is a personal blog website created to 
 - **Spring Data JPA**: For efficient and scalable database operations, using Java Persistence API (JPA) to interact with MySQL and H2 databases.
 - **Spring Security**: Used for securing the application, implementing authentication and authorization mechanisms.
 - **JWT (JSON Web Token)**: Used for implementing stateless authentication with token-based user sessions.
-- **MySQL**: A relational database management system used for storing blog posts, user data, and other application-related information.
-- **H2**: A lightweight, in-memory database used for development and testing purposes.
+- **MariaDB**: A relational database management system used for storing posts, users, tags and other application-related information.
+- **H2**: A lightweight, in-memory database used and testing purposes.
 - **Spring AOP (Aspect-Oriented Programming)**: Used to manage cross-cutting concerns such as logging, security, and transaction management.
 - **JUnit 5**: A testing framework for writing and executing tests.
 - **Mockito**: A popular mocking framework used in conjunction with JUnit 5 to test components in isolation.
