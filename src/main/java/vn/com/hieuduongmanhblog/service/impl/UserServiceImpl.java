@@ -5,12 +5,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 import vn.com.hieuduongmanhblog.dto.UserDTO;
+import vn.com.hieuduongmanhblog.dto.UserRegistrationRequestDTO;
 import vn.com.hieuduongmanhblog.dto.mapper.UserMapper;
 import vn.com.hieuduongmanhblog.entity.Post;
+import vn.com.hieuduongmanhblog.entity.Role;
+import vn.com.hieuduongmanhblog.entity.RoleName;
 import vn.com.hieuduongmanhblog.entity.User;
 import vn.com.hieuduongmanhblog.exception.ResourceNotFoundException;
+import vn.com.hieuduongmanhblog.exception.UserAlreadyExistException;
+import vn.com.hieuduongmanhblog.repository.RoleRepository;
 import vn.com.hieuduongmanhblog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -25,24 +31,31 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
+    private final RoleRepository roleRepository;
+
     private final UserMapper userMapper;
 
     private final ImageStorageService imageService;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${project.image.url}")
     private String avatarUrlBase;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, ImageStorageService imageStorageService) {
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, UserMapper userMapper, ImageStorageService imageStorageService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.userMapper = userMapper;
         this.imageService = imageStorageService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -74,6 +87,31 @@ public class UserServiceImpl implements UserService {
             User foundUser = optionalUser.get();
             return this.userMapper.toUserDTO(foundUser);
         } else throw new ResourceNotFoundException("Could not find User with username - " + username);
+    }
+
+    @Override
+    @Transactional
+    public UserDTO createNewUser(UserRegistrationRequestDTO userData) {
+        if (this.userRepository.existsByUsername(userData.username())) {
+            throw new UserAlreadyExistException("User with username " + userData.username() + " already exists!");
+        }
+        if (this.userRepository.existsByEmail(userData.email())) {
+            throw new UserAlreadyExistException("User with email " + userData.username() + " already exists!");
+        }
+
+        User newUser = new User(
+                userData.username(),
+                this.passwordEncoder.encode(userData.password()),
+                userData.email(),
+                true,
+                LocalDateTime.now()
+        );
+        Role defaultUserRole = this.roleRepository.findByRoleName(RoleName.USER)
+                .orElseThrow(() -> new ResourceNotFoundException("Could not find Role with roleName - " + RoleName.USER.name()));
+        newUser.setRoles(Set.of(defaultUserRole));
+        User createdUser = this.userRepository.save(newUser);
+
+        return this.userMapper.toUserDTO(createdUser);
     }
 
     @Override

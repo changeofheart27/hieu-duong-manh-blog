@@ -51,11 +51,18 @@ public class GlobalExceptionHandler {
                 .body(new ResponseDTO(HttpStatus.UNAUTHORIZED.value(), exception.getMessage(), LocalDateTime.now()));
     }
 
-    @ExceptionHandler(UserAlreadyExistAuthenticationException.class)
-    public ResponseEntity<ResponseDTO> handleUserAlreadyExistAuthenticationException(UserAlreadyExistAuthenticationException exception) {
+    @ExceptionHandler(UserAlreadyExistException.class)
+    public ResponseEntity<ResponseDTO> handleUserAlreadyExistException(UserAlreadyExistException exception) {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(new ResponseDTO(HttpStatus.CONFLICT.value(), exception.getMessage(), LocalDateTime.now()));
+    }
+
+    @ExceptionHandler(UserDisabledException.class)
+    public ResponseEntity<ResponseDTO> handleUserDisabledException(UserAlreadyExistException exception) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ResponseDTO(HttpStatus.FORBIDDEN.value(), exception.getMessage(), LocalDateTime.now()));
     }
 
     @ExceptionHandler(Exception.class)

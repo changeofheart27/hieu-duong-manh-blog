@@ -17,10 +17,11 @@ import vn.com.hieuduongmanhblog.dto.UserRegistrationRequestDTO;
 import vn.com.hieuduongmanhblog.entity.Role;
 import vn.com.hieuduongmanhblog.entity.RoleName;
 import vn.com.hieuduongmanhblog.entity.User;
-import vn.com.hieuduongmanhblog.exception.UserAlreadyExistAuthenticationException;
+import vn.com.hieuduongmanhblog.exception.UserAlreadyExistException;
 import vn.com.hieuduongmanhblog.repository.RoleRepository;
 import vn.com.hieuduongmanhblog.repository.UserRepository;
 import vn.com.hieuduongmanhblog.service.impl.JwtAuthenticationServiceImpl;
+import vn.com.hieuduongmanhblog.service.impl.JwtUtilService;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -69,6 +70,7 @@ public class JwtAuthenticationServiceImplTest {
                 registrationRequestDTO.username(),
                 registrationRequestDTO.password(),
                 registrationRequestDTO.email(),
+                true,
                 registrationRequestDTO.createdAt()
         );
 
@@ -95,11 +97,11 @@ public class JwtAuthenticationServiceImplTest {
                 new UserRegistrationRequestDTO("hieudm", "test@123", "hieudm@email.com", LocalDateTime.now());
 
         Mockito.when(userRepository.existsByUsername(registrationRequestDTO.username())).thenThrow(
-                new UserAlreadyExistAuthenticationException("User with username " + registrationRequestDTO.username() + " already exists!")
+                new UserAlreadyExistException("User with username " + registrationRequestDTO.username() + " already exists!")
         );
 
         Assertions.assertThrows(
-                UserAlreadyExistAuthenticationException.class,
+                UserAlreadyExistException.class,
                 () -> jwtAuthenticationService.registerUser(registrationRequestDTO),
                 "Should throw exception"
         );

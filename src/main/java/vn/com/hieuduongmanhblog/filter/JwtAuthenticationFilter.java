@@ -2,7 +2,7 @@ package vn.com.hieuduongmanhblog.filter;
 
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import vn.com.hieuduongmanhblog.exception.JwtAuthenticationEntryPoint;
-import vn.com.hieuduongmanhblog.service.JwtUtilService;
+import vn.com.hieuduongmanhblog.service.impl.JwtUtilService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

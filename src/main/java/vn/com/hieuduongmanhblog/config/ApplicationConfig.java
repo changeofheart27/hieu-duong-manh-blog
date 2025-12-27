@@ -12,7 +12,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import vn.com.hieuduongmanhblog.service.impl.CustomUserDetailsService;
 
+/**
+ * Configure UserDetailsService here to avoid Circular Dependencies Error when running application.
+ */
 @Configuration
 public class ApplicationConfig {
     private final UserRepository userRepository;
@@ -24,13 +28,7 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> {
-            return userRepository
-                    .findByUsername(username)
-                    .orElseThrow(() ->
-                            new UsernameNotFoundException("User with username " + username + " not found!")
-                    );
-        };
+        return new CustomUserDetailsService(userRepository);
     }
 
     @Bean

@@ -1,25 +1,29 @@
 package vn.com.hieuduongmanhblog.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "Registration request with user credentials")
+@Schema(description = "User Registration Request Payload")
 public record UserRegistrationRequestDTO(
-    @Schema(description = "Username", example = "john_doe", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "username cannot be null")
+    @Schema(description = "username", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "Username is required")
+    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
     String username,
 
-    @Schema(description = "Password", example = "SecurePass123!", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "password cannot be null")
+    @Schema(description = "password", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, message = "Password must be at least 6 characters")
     String password,
 
-    @Schema(description = "Email address", example = "johndoe@example.com")
-    @Pattern(regexp = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$", message = "email is not valid")
+    @Schema(description = "email address", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(regexp = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$", message = "Email must be valid")
     String email,
 
-    @Schema(description = "Creation timestamp", example = "2024-01-01T09:30:00")
+    @Schema(description = "creation timestamp")
     LocalDateTime createdAt
 ) {}

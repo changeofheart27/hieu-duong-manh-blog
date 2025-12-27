@@ -3,6 +3,7 @@ package vn.com.hieuduongmanhblog.service;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 import vn.com.hieuduongmanhblog.dto.UserDTO;
+import vn.com.hieuduongmanhblog.dto.UserRegistrationRequestDTO;
 
 import java.io.IOException;
 
@@ -13,7 +14,9 @@ public interface UserService {
 
     UserDTO findUserByUsername(String username);
 
-    UserDTO updateUserById(int userId, UserDTO newUser);
+    UserDTO createNewUser(UserRegistrationRequestDTO userData);
+
+    UserDTO updateUserById(int userId, UserDTO userData);
 
     void deleteUserById(int userId);
 

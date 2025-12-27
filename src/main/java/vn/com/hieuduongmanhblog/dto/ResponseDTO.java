@@ -4,18 +4,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "Standardized response message")
+@Schema(description = "Standardized Response Body")
 public record ResponseDTO(
-    @Schema(description = "HTTP status code", example = "200")
+    @Schema(description = "HTTP status code")
     int status,
 
-    @Schema(description = "Response message", example = "Get All Users Successful")
+    @Schema(description = "response message")
     String message,
 
-    @Schema(description = "Creation timestamp", example = "2024-01-01T12:00:00")
+    @Schema(description = "creation timestamp")
     LocalDateTime timestamp,
 
-    @Schema(description = "Response data")
+    @Schema(description = "response data")
     Object data
 ) {
     public ResponseDTO(int status, String message, LocalDateTime timestamp) {

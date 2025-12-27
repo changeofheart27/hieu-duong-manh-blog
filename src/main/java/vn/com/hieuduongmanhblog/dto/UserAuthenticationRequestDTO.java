@@ -1,15 +1,18 @@
 package vn.com.hieuduongmanhblog.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-@Schema(description = "Login request containing user credentials")
+@Schema(description = "User Authentication Request Payload")
 public record UserAuthenticationRequestDTO(
-    @Schema(description = "Username", example = "john_doe", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "username cannot be null")
-    String username,
+        @Schema(description = "username", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotBlank(message = "Username is required")
+        @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+        String username,
 
-    @Schema(description = "Password", example = "P@ssw0rd123", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "password cannot be null")
-    String password
+        @Schema(description = "password", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotBlank(message = "Password is required")
+        @Size(min = 6, message = "Password must be at least 6 characters")
+        String password
 ) {}

@@ -17,7 +17,7 @@ import vn.com.hieuduongmanhblog.dto.UserAuthenticationRequestDTO;
 import vn.com.hieuduongmanhblog.dto.UserRegistrationRequestDTO;
 import vn.com.hieuduongmanhblog.exception.JwtAuthenticationEntryPoint;
 import vn.com.hieuduongmanhblog.service.AuthenticationService;
-import vn.com.hieuduongmanhblog.service.JwtUtilService;
+import vn.com.hieuduongmanhblog.service.impl.JwtUtilService;
 
 import java.time.LocalDateTime;
 
