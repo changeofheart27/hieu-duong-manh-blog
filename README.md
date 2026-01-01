@@ -23,7 +23,7 @@ Welcome to **Hieu Duong Manh Blog**! This is a personal blog website created to 
 - **Spring AOP (Aspect-Oriented Programming)**: Used to manage cross-cutting concerns such as logging, security, and transaction management.
 - **JUnit 5**: A testing framework for writing and executing tests.
 - **Mockito**: A popular mocking framework used in conjunction with JUnit 5 to test components in isolation.
-- **Swagger / Springdoc OpenAPI**: For generating interactive API documentation.
+- **Swagger UI (Springdoc OpenAPI)**: a web-based interface to view and test APIs that are described using the OpenAPI specification.
 
 ## Installation
 
