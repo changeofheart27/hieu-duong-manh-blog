@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 
-@Tag(name = "Authentication Controller", description = "Endpoints for User Authentication")
+@Tag(name = "Authentication Controller", description = "Endpoints for User Authentication Operations")
 @RestController
 @RequestMapping("/api/v1/auth")
 public class JwtAuthenticationController {
@@ -41,7 +41,7 @@ public class JwtAuthenticationController {
     }
 
     @Operation(description = "Get new access token using existing refresh token")
-    @PostMapping("/token")
+    @PostMapping("/refresh-token")
     public ResponseEntity<ResponseDTO> refreshAccessToken(@Valid @RequestBody RefreshTokenRequestDTO request) {
         UserAuthenticationResponseDTO authenticationResponseDTO = authenticationService.refreshAccessToken(request);
         return ResponseEntity

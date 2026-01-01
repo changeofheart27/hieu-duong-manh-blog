@@ -10,6 +10,7 @@ import vn.com.hieuduongmanhblog.dto.UserAuthenticationRequestDTO;
 import vn.com.hieuduongmanhblog.dto.UserAuthenticationResponseDTO;
 import vn.com.hieuduongmanhblog.entity.RefreshToken;
 import vn.com.hieuduongmanhblog.entity.User;
+import vn.com.hieuduongmanhblog.exception.ResourceNotFoundException;
 import vn.com.hieuduongmanhblog.exception.UserDisabledException;
 import vn.com.hieuduongmanhblog.repository.RefreshTokenRepository;
 import vn.com.hieuduongmanhblog.repository.UserRepository;
@@ -98,7 +99,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     public UserAuthenticationResponseDTO refreshAccessToken(RefreshTokenRequestDTO request) {
         RefreshToken existingRefreshToken = refreshTokenRepository.findByToken(request.refreshToken())
-                .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid refresh token"));
         if (existingRefreshToken.getRevoked()) {
             throw new RuntimeException("Refresh token has been revoked");
         }
