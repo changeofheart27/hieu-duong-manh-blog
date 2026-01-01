@@ -1,17 +1,16 @@
 package vn.com.hieuduongmanhblog.service;
 
+import vn.com.hieuduongmanhblog.dto.TagDTO;
 import vn.com.hieuduongmanhblog.entity.Tag;
 
 import java.util.List;
 
 public interface TagService {
-    List<Tag> getAllTags();
+    List<TagDTO> getAllTags();
 
-    Tag findTagById(int tagId);
+    TagDTO findTagById(int tagId);
 
-    Tag createTag(Tag newTag);
-
-    Tag updateTagById(int tagId, Tag newTag);
+    TagDTO createTag(TagDTO newTag);
 
     void deleteTagById(int tagId);
 }

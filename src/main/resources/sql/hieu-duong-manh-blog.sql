@@ -18,7 +18,8 @@ CREATE TABLE `users` (
   `username` varchar(50) not null unique,
   `password` char(68) not null,
   `dob` date,
-  `email` varchar(50),
+  `email` varchar(50) not null unique,
+  `enabled` boolean not null default true,
   `created_at` datetime default (now()),
   `updated_at` datetime default null,
   `avatar` varchar(255) default null,
@@ -31,12 +32,12 @@ CREATE TABLE `users` (
 -- A generation tool is avail at: https://www.bcryptcalculator.com/
 -- Default passwords here are: test@123
 --
-INSERT INTO `users` (`id`, `username`, `password`, `dob`, `email`)
+INSERT INTO `users` (`id`, `username`, `password`, `dob`, `email`, `enabled`)
 VALUES
-(`id`,'hieudm','$2a$10$sfCjRHz8YOnpFXUe8pQxaO2hjtoERH1NHngW9mD7TA4WLkHExCRaO','1999-07-02','hieudhanu27@gmail.com'),
-(`id`,'trinm','$2a$10$sfCjRHz8YOnpFXUe8pQxaO2hjtoERH1NHngW9mD7TA4WLkHExCRaO',null,'tringuyenm@gmail.com'),
-(`id`,'phuongct','$2a$10$sfCjRHz8YOnpFXUe8pQxaO2hjtoERH1NHngW9mD7TA4WLkHExCRaO',null,'phuongcaot@gmail.com'),
-(`id`,'thanhpt','$2a$10$sfCjRHz8YOnpFXUe8pQxaO2hjtoERH1NHngW9mD7TA4WLkHExCRaO',null,'thanhphamt@gmail.com');
+(`id`,'hieudm','$2a$10$sfCjRHz8YOnpFXUe8pQxaO2hjtoERH1NHngW9mD7TA4WLkHExCRaO','1999-07-02','hieudhanu27@gmail.com', true),
+(`id`,'trinm','$2a$10$sfCjRHz8YOnpFXUe8pQxaO2hjtoERH1NHngW9mD7TA4WLkHExCRaO',null,'tringuyenm@gmail.com', true),
+(`id`,'phuongct','$2a$10$sfCjRHz8YOnpFXUe8pQxaO2hjtoERH1NHngW9mD7TA4WLkHExCRaO',null,'phuongcaot@gmail.com', true),
+(`id`,'thanhpt','$2a$10$sfCjRHz8YOnpFXUe8pQxaO2hjtoERH1NHngW9mD7TA4WLkHExCRaO',null,'thanhphamt@gmail.com', true);
 
 --
 -- Table structure for table `roles`
@@ -103,9 +104,9 @@ VALUES
 --
 CREATE TABLE `posts` (
   `id` int not null auto_increment,
-  `title` varchar(100) not null,
-  `description` varchar(200),
-  `content` text,
+  `title` varchar(100) not null unique,
+  `description` varchar(200) not null,
+  `content` text not null,
   `created_at` datetime default (now()),
   `updated_at` datetime default null,
   `user_id` int,
@@ -135,7 +136,6 @@ VALUES
 (`id`,'The Rise of Artificial Intelligence', 'Artificial Intelligence is transforming industries. Discover its potential and impact on the future.', 'Quisque eget felis non lectus cursus suscipit at non enim. Mauris id lorem neque. Ut tristique ex et enim laoreet, eget tempus velit maximus. Sed scelerisque lorem vitae nunc rutrum tristique. Curabitur sed metus justo. Aenean at dui eget augue faucibus interdum. Aliquam viverra ante vitae ante facilisis, id cursus risus tincidunt. Vivamus venenatis feugiat magna, at euismod risus varius nec.', 4);
 
 
-
 --
 -- Table structure for table `posts-tags`
 --
@@ -157,3 +157,16 @@ VALUES
 (3,3),
 (4,2),
 (5,2);
+
+--
+-- Table structure for table `refresh_tokens`
+--
+CREATE TABLE `refresh_tokens` (
+    `id` int auto_increment primary key,
+    `user_id` int not null,
+    `token` text not null unique,
+    `expiry_date` date,
+    `revoked` boolean default true,
+    CONSTRAINT FOREIGN KEY (user_id) REFERENCES users(id)
+        ON DELETE CASCADE
+);

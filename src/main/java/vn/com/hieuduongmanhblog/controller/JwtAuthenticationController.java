@@ -5,9 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import vn.com.hieuduongmanhblog.dto.UserAuthenticationRequestDTO;
-import vn.com.hieuduongmanhblog.dto.UserRegistrationRequestDTO;
-import vn.com.hieuduongmanhblog.dto.ResponseDTO;
+import vn.com.hieuduongmanhblog.dto.*;
 import vn.com.hieuduongmanhblog.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 
-@Tag(name = "Authentication Controller", description = "Endpoints for user authentication")
+@Tag(name = "Authentication Controller", description = "Endpoints for User Authentication Operations")
 @RestController
 @RequestMapping("/api/v1/auth")
 public class JwtAuthenticationController {
@@ -28,27 +26,31 @@ public class JwtAuthenticationController {
         this.authenticationService = authenticationService;
     }
 
-    @Operation(
-            summary = "User Registration",
-            description = "Register new user on the system using username and password."
-    )
-    @PostMapping("/register")
-    public ResponseEntity<ResponseDTO> registerUser(@Valid @RequestBody UserRegistrationRequestDTO request) {
-        String jwtToken = authenticationService.registerUser(request);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(new ResponseDTO(HttpStatus.CREATED.value(), "Register New User Successful", LocalDateTime.now(), jwtToken));
-    }
-
-    @Operation(
-            summary = "User Authentication",
-            description = "Login the system using username and password."
-    )
+    @Operation(description = "Login to the system using username and password")
     @PostMapping("/login")
-    public ResponseEntity<ResponseDTO> authenticateUser(@Valid @RequestBody UserAuthenticationRequestDTO request) {
-        String jwtToken = authenticationService.authenticateUser(request);
+    public ResponseEntity<ResponseDTO> login(@Valid @RequestBody UserAuthenticationRequestDTO request) {
+        UserAuthenticationResponseDTO authenticationResponseDTO = authenticationService.login(request);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ResponseDTO(HttpStatus.OK.value(), "Login Successful", LocalDateTime.now(), jwtToken));
+                .body(new ResponseDTO(
+                        HttpStatus.OK.value(),
+                        "Login Successful",
+                        LocalDateTime.now(),
+                        authenticationResponseDTO)
+                );
+    }
+
+    @Operation(description = "Get new access token using existing refresh token")
+    @PostMapping("/refresh-token")
+    public ResponseEntity<ResponseDTO> refreshAccessToken(@Valid @RequestBody RefreshTokenRequestDTO request) {
+        UserAuthenticationResponseDTO authenticationResponseDTO = authenticationService.refreshAccessToken(request);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDTO(
+                        HttpStatus.OK.value(),
+                        "Refresh Access Token Successful",
+                        LocalDateTime.now(),
+                        authenticationResponseDTO)
+                );
     }
 }

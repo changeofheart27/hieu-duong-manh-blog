@@ -1,5 +1,7 @@
 package vn.com.hieuduongmanhblog.service.impl;
 
+import vn.com.hieuduongmanhblog.dto.TagDTO;
+import vn.com.hieuduongmanhblog.dto.mapper.TagMapper;
 import vn.com.hieuduongmanhblog.entity.Tag;
 import vn.com.hieuduongmanhblog.exception.ResourceNotFoundException;
 import vn.com.hieuduongmanhblog.repository.TagRepository;
@@ -14,40 +16,41 @@ import java.util.Optional;
 @Service
 public class TagServiceImpl implements TagService {
     private final TagRepository tagRepository;
+    private final TagMapper tagMapper;
 
     @Autowired
-    public TagServiceImpl(TagRepository tagRepository) {
+    public TagServiceImpl(TagRepository tagRepository, TagMapper tagMapper) {
         this.tagRepository = tagRepository;
+        this.tagMapper = tagMapper;
     }
 
     @Override
-    public List<Tag> getAllTags() {
-        return tagRepository.findAll();
+    public List<TagDTO> getAllTags() {
+        List<Tag> allTags = tagRepository.findAll();
+        return allTags
+                .stream()
+                .map(tagMapper::toTagDTO)
+                .toList();
     }
 
     @Override
-    public Tag findTagById(int tagId) {
+    public TagDTO findTagById(int tagId) {
         Optional<Tag> optionalTag = tagRepository.findById(tagId);
         if (optionalTag.isPresent()) {
-            return optionalTag.get();
+            return tagMapper.toTagDTO(optionalTag.get());
         } else throw new ResourceNotFoundException("Could not find Tag with id - " + tagId);
     }
 
     @Override
     @Transactional
-    public Tag createTag(Tag newTag) {
+    public TagDTO createTag(TagDTO newTag) {
         // setting id to 0 to avoid passing new post with existing id inside database
         // and a save of new item instead of updating current one
-        newTag.setId(0);
-        return tagRepository.save(newTag);
-    }
+        TagDTO tagDTOWithZeroID = newTag.TagDTOWithDefaultId(0);
+        Tag tagToCreate = tagMapper.toTag(tagDTOWithZeroID);
+        tagRepository.save(tagToCreate);
 
-    @Override
-    @Transactional
-    public Tag updateTagById(int tagId, Tag newTag) {
-        Tag tagToUpdate = findTagById(tagId);
-        tagToUpdate.setTagName(newTag.getTagName());
-        return tagRepository.save(newTag);
+        return tagMapper.toTagDTO(tagToCreate);
     }
 
     @Override

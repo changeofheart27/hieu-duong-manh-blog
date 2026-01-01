@@ -1,5 +1,11 @@
 package vn.com.hieuduongmanhblog.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,6 +21,7 @@ import java.net.URLConnection;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Tag(name = "Image Storage Controller", description = "Endpoints for Image Storage Operations")
 @RestController
 @RequestMapping("/api/v1/images")
 public class ImageStorageController {
@@ -25,6 +32,25 @@ public class ImageStorageController {
         this.imageService = imageService;
     }
 
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Upload Image Successful",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Upload Image Failed",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseDTO.class)
+                    )
+            )
+    })
+    @Operation(summary = "Upload Image", description = "Upload Image To The Application")
     @PostMapping("/upload")
     public ResponseEntity<ResponseDTO> uploadImage(@RequestPart MultipartFile imageFile) {
         try {
@@ -39,7 +65,16 @@ public class ImageStorageController {
         }
     }
 
-    @GetMapping("/")
+    @ApiResponse(
+            responseCode = "200",
+            description = "Get All Image URLs Successful",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ResponseDTO.class)
+            )
+    )
+    @Operation(summary = "Get All Image URLs", description = "Get All Image URLs")
+    @GetMapping
     public ResponseEntity<ResponseDTO> getAllImageUrls() {
         try {
         List<String> imageUrls = this.imageService.getAllImageUrls();
@@ -53,7 +88,16 @@ public class ImageStorageController {
         }
     }
 
-    @GetMapping(value = "/{imageName:.+}")
+    @ApiResponse(
+            responseCode = "200",
+            description = "Display Image Successful",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ResponseDTO.class)
+            )
+    )
+    @Operation(summary = "Display Image", description = "Display Image With Specific Image Name")
+    @GetMapping("/{imageName:.+}")
     public ResponseEntity<byte[]> loadImage(@PathVariable String imageName) {
         try {
             byte[] image = this.imageService.loadImage(imageName);
